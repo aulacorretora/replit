@@ -223,7 +223,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     });
     
-    ws.on('error', (error) => {
+    ws.on('error', (error: Error) => {
       console.error('WebSocket error:', error);
     });
     

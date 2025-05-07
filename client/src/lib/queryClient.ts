@@ -42,7 +42,10 @@ export async function apiRequest(
 
   // Usar a URL completa, garantindo que os endpoints da API sejam acessados corretamente
   // Não importa se a URL já tiver o prefixo /api, isso garante que sempre será o endereço correto
-  const fullUrl = url.startsWith('http') ? url : `${window.location.origin}${url}`;
+  const apiBaseUrl = import.meta.env.PROD
+    ? window.location.origin 
+    : 'http://localhost:5000';
+  const fullUrl = url.startsWith('http') ? url : `${apiBaseUrl}${url}`;
 
   try {
     const response = await fetch(fullUrl, options);

@@ -17,19 +17,41 @@ interface AuthContextProps {
 export const AuthContext = createContext<AuthContextProps | null>(null);
 
 // Provider que envolve a aplicação e fornece os dados de autenticação
-export function AuthProvider({ children }: { children: ReactNode }) {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Busca o usuário atual quando o componente é montado
+  const fetchUser = async () => {
+    try {
+      const response = await fetch(`${window.location.origin}${API_ENDPOINTS.USER}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        if (response.status === 401) return null;
+        throw new Error('Falha ao buscar usuário');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Erro ao buscar usuário:', error);
+      throw error;
+    }
+  };
+
   const {
     data: userData,
     error,
     isLoading,
   } = useQuery({
-    queryKey: [API_ENDPOINTS.USER],
-    queryFn: getQueryFn({ on401: "returnNull" }),
+    queryKey: ['user'],
+    queryFn: fetchUser,
     retry: false,
     gcTime: 1000 * 60 * 60, // 1 hora (em TanStack Query v5, use gcTime em vez de cacheTime)
     staleTime: 1000 * 60 * 5, // 5 minutos

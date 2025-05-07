@@ -11,10 +11,19 @@ import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import bcrypt from "bcryptjs";
 
+declare module 'express-session' {
+  interface Session {
+    passport?: {
+      user?: number;
+    };
+    user?: Omit<User, 'password'>;
+  }
+}
+
 // Extender a interface Express.User para usar nosso tipo User
 declare global {
   namespace Express {
-    interface User extends User {}
+    interface User extends Omit<import('@shared/schema').User, 'password'> {}
   }
 }
 
@@ -256,7 +265,7 @@ export function setupAuth(app: Express) {
       return res.status(400).json({ message: "Email e senha são obrigatórios" });
     }
     
-    passport.authenticate("local", (err, user, info) => {
+    passport.authenticate("local", (err: any, user: User, info: any) => {
       if (err) {
         console.error("Erro durante a autenticação:", err);
         return next(err);
@@ -410,13 +419,13 @@ export function setupAuth(app: Express) {
       
       // Verificar se a sessão existe e atualizar dados do usuário nela para futuras requisições
       if (req.session && !req.session.user) {
-        const { password, ...userWithoutPassword } = req.user;
+        const { password, ...userWithoutPassword } = req.user as (User & { password: string });
         req.session.user = userWithoutPassword;
         console.log("Atualizando dados do usuário na sessão para futuras requisições");
       }
       
       // Retirar a senha antes de enviar a resposta
-      const { password, ...userWithoutPassword } = req.user;
+      const { password, ...userWithoutPassword } = req.user as (User & { password: string });
       return res.json(userWithoutPassword);
     }
     

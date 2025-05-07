@@ -4,6 +4,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
@@ -15,6 +16,12 @@ declare module 'express-session' {
 }
 
 const app = express();
+
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:5000'],
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
