@@ -18,7 +18,7 @@ declare module 'express-session' {
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5000'],
+  origin: true,
   credentials: true
 }));
 
