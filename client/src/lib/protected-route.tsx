@@ -12,6 +12,7 @@ export function ProtectedRoute({
   component: Component,
 }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth();
+  console.log('ProtectedRoute:', { path, user, isLoading });
 
   // Se estiver carregando, mostra um loader
   if (isLoading) {
@@ -26,9 +27,16 @@ export function ProtectedRoute({
 
   // Se não estiver autenticado, redireciona para a página de login
   if (!user) {
+    console.log('No user found, redirecting to /auth');
+    setTimeout(() => {
+      window.location.href = '/auth';
+    }, 100);
+    
     return (
       <Route path={path}>
-        <Redirect to="/auth" />
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
       </Route>
     );
   }

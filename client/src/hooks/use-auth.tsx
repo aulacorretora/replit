@@ -93,8 +93,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const res = await apiRequest('GET', API_ENDPOINTS.USER, undefined, {
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache'
-          }
+            'Pragma': 'no-cache',
+            'Credentials': 'include'
+          },
+          credentials: 'include'
         });
         if (res.ok) {
           const userData = await res.json();
@@ -106,6 +108,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           return userData;
         }
+        localStorage.removeItem('zapban_user');
+        localStorage.removeItem('userId');
         return null;
       } catch (err) {
         console.error('Erro ao buscar informações do usuário:', err);
@@ -130,6 +134,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Salvar dados do usuário no localStorage
       localStorage.setItem('zapban_user', JSON.stringify(userData));
       localStorage.setItem('userId', userData.id.toString());
+      
+      window.location.href = '/dashboard';
+      
       toast({
         title: "Login realizado com sucesso",
         description: `Bem-vindo(a), ${userData.name}!`,
@@ -165,6 +172,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Salvar dados do usuário no localStorage
       localStorage.setItem('zapban_user', JSON.stringify(userData));
       localStorage.setItem('userId', userData.id.toString());
+      
+      window.location.href = '/dashboard';
+      
       toast({
         title: "Cadastro realizado com sucesso",
         description: `Conta criada para ${userData.name}.`,
