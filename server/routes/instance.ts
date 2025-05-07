@@ -9,6 +9,7 @@ import {
   getQRCode,
   disconnectInstanceHandler
 } from '../controllers/instance';
+import { pingInstance } from '../controllers/ping';
 
 const router = Router();
 
@@ -38,5 +39,8 @@ router.get('/:id/qrcode', getQRCode);
 
 // POST /api/instances/:id/disconnect
 router.post('/:id/disconnect', disconnectInstanceHandler);
+
+// GET /api/instances/:id/ping
+router.get('/:id/ping', pingInstance);
 
 export default router;

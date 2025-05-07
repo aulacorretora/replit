@@ -45,11 +45,16 @@ const qrCodes = new Map();
 const connectionStates = new Map();
 
 // Store path for session data
-const SESSION_PATH = path.join(process.cwd(), 'whatsapp-sessions');
+const SESSION_PATH = process.env.NODE_ENV === 'production' 
+  ? '/var/www/zapban/whatsapp-sessions' 
+  : path.join(process.cwd(), 'whatsapp-sessions');
 
 // Create sessions directory if it doesn't exist
 if (!fs.existsSync(SESSION_PATH)) {
   fs.mkdirSync(SESSION_PATH, { recursive: true });
+  if (process.env.NODE_ENV === 'production') {
+    fs.chmodSync(SESSION_PATH, 0o770);
+  }
 }
 
 // In-memory message store
@@ -113,6 +118,11 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
       connectTimeoutMs: 120000, // Increased timeout for connection
       qrTimeout: 60000, // Increased timeout for QR code
       defaultQueryTimeoutMs: 60000,
+      keepAliveIntervalMs: 25000, // Manter conexão ativa
+      transactionOpts: {
+        maxCommits: 10,
+        delayMs: 500
+      },
       emitOwnEvents: true, // Enable to receive all events
       retryRequestDelayMs: 1000,
       markOnlineOnConnect: true, // Ensure device shows as online
@@ -309,12 +319,23 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
           // Detecção específica para erro de ambiente restrito (Replit)
           const restrictedEnvironment = disconnectReason.includes('Connection Terminated by Server') || 
                                       statusCode === 428 || 
-                                      disconnectReason.includes('Precondition Required');
+                                      disconnectReason.includes('Precondition Required') ||
+                                      disconnectReason.includes('Socket Closed') ||
+                                      disconnectReason.includes('Connection Failure') ||
+                                      disconnectReason.includes('Timeout');
           
           if (restrictedEnvironment) {
-            console.error(`⚠️ AVISO: Ambiente restrito detectado para instância ${instanceId}`);
-            console.error(`O servidor do WhatsApp parece estar bloqueando este ambiente (possível restrição do Replit).`);
-            console.error(`Recomendamos migrar a aplicação para a VPS em zapban.com para conexão completa.`);
+            enhancedLog('error', `⚠️ AVISO: Ambiente restrito detectado para instância ${instanceId}`);
+            enhancedLog('error', `O servidor do WhatsApp parece estar bloqueando este ambiente (possível restrição do Replit).`);
+            enhancedLog('error', `Recomendamos migrar a aplicação para a VPS em zapban.com para conexão completa.`);
+            
+            // Registrar informações adicionais para diagnóstico
+            enhancedLog('error', `Detalhes técnicos do erro:`, { 
+              disconnectReason, 
+              statusCode, 
+              instanceId,
+              timestamp: new Date().toISOString()
+            });
             
             // Notificar o usuário sobre o problema
             global.broadcastToUser(userId, 'instance_status', {
@@ -1087,4 +1108,25 @@ export function setupBaileysWebhooks(broadcast: Function, broadcastToUser: Funct
   // Note: The Baileys event handlers are set up in the initializeInstance function
   // where we have access to the socket instance and can register event listeners
   console.log('WebSocket broadcast handlers registered');
+}
+
+function enhancedLog(level: string, message: string, context?: any) {
+  const timestamp = new Date().toISOString();
+  const formattedMessage = `[${timestamp}] [${level}] ${message}`;
+  
+  console[level === 'error' ? 'error' : 'log'](formattedMessage);
+  
+  if (process.env.NODE_ENV === 'production') {
+    try {
+      const logDir = path.join(process.cwd(), 'logs');
+      if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir, { recursive: true });
+      }
+      
+      const logFile = path.join(logDir, `baileys-${level}.log`);
+      fs.appendFileSync(logFile, formattedMessage + (context ? ` ${JSON.stringify(context)}` : '') + '\n');
+    } catch (error) {
+      console.error('Failed to write to log file:', error);
+    }
+  }
 }
