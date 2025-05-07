@@ -53,7 +53,11 @@ function AdminRoute({ path, component: Component }: { path: string, component: R
     );
   }
   
-  return <Route path={path} component={Component} />;
+  return (
+    <Route path={path}>
+      <Component />
+    </Route>
+  );
 }
 
 function Router() {
@@ -129,13 +133,27 @@ function WebSocketManager() {
       if (userId) {
         console.log(`Attempting to identify user ${userId} with WebSocket (source: ${storedUserId ? 'localStorage' : 'context'})`);
         
-        // Add a small delay to ensure connection is established
         const timer = setTimeout(() => {
           // Only send if socket is ready
-          wsInstance.send('identify', { userId });
-          console.log(`WebSocket identified as user ${userId}`);
-          setHasIdentified(true);
-        }, 1000);
+          try {
+            wsInstance.send('identify', { userId });
+            console.log(`WebSocket identified as user ${userId}`);
+            setHasIdentified(true);
+          } catch (err) {
+            console.error('Error identifying WebSocket user:', err);
+            setTimeout(() => {
+              if (wsInstance) {
+                try {
+                  wsInstance.send('identify', { userId });
+                  console.log(`WebSocket retry identification successful for user ${userId}`);
+                  setHasIdentified(true);
+                } catch (retryErr) {
+                  console.error('Retry identification failed:', retryErr);
+                }
+              }
+            }, 2000);
+          }
+        }, 2000);
         
         return () => clearTimeout(timer);
       } else {

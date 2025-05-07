@@ -122,7 +122,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mutation para login
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      const res = await apiRequest('POST', API_ENDPOINTS.LOGIN, credentials);
+      const res = await apiRequest('POST', API_ENDPOINTS.LOGIN, credentials, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Credentials': 'include'
+        }
+      });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || 'Erro ao fazer login');
@@ -135,7 +141,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('zapban_user', JSON.stringify(userData));
       localStorage.setItem('userId', userData.id.toString());
       
-      window.location.href = '/dashboard';
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1000);
       
       toast({
         title: "Login realizado com sucesso",
@@ -160,7 +168,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password: userData.password,
       };
       
-      const res = await apiRequest('POST', API_ENDPOINTS.REGISTER, formData);
+      const res = await apiRequest('POST', API_ENDPOINTS.REGISTER, formData, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Credentials': 'include'
+        }
+      });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || 'Erro ao cadastrar');
@@ -173,7 +187,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('zapban_user', JSON.stringify(userData));
       localStorage.setItem('userId', userData.id.toString());
       
-      window.location.href = '/dashboard';
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1000);
       
       toast({
         title: "Cadastro realizado com sucesso",
@@ -192,7 +208,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mutation para logout
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest('POST', API_ENDPOINTS.LOGOUT);
+      const res = await apiRequest('POST', API_ENDPOINTS.LOGOUT, undefined, {
+        credentials: 'include',
+        headers: {
+          'Credentials': 'include'
+        }
+      });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || 'Erro ao fazer logout');
@@ -220,7 +241,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mutation para recuperação de senha
   const forgotPasswordMutation = useMutation({
     mutationFn: async (data: ForgotPasswordData) => {
-      const res = await apiRequest('POST', API_ENDPOINTS.FORGOT_PASSWORD, data);
+      const res = await apiRequest('POST', API_ENDPOINTS.FORGOT_PASSWORD, data, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Credentials': 'include'
+        }
+      });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || 'Erro ao solicitar recuperação de senha');
@@ -244,7 +271,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mutation para redefinição de senha
   const resetPasswordMutation = useMutation({
     mutationFn: async (data: ResetPasswordData) => {
-      const res = await apiRequest('POST', API_ENDPOINTS.RESET_PASSWORD, data);
+      const res = await apiRequest('POST', API_ENDPOINTS.RESET_PASSWORD, data, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Credentials': 'include'
+        }
+      });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || 'Erro ao redefinir senha');

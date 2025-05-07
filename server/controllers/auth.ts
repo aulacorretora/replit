@@ -86,12 +86,25 @@ export async function register(req: Request, res: Response) {
         name: newUser[0].name,
         role: newUser[0].role,
       };
+      
+      req.session.save((err) => {
+        if (err) {
+          console.error('Erro ao salvar sessão após registro:', err);
+        }
+        
+        // Remove informações sensíveis
+        const userResponse = { ...newUser[0] };
+        delete userResponse.password;
+        
+        return res.status(HTTP_STATUS.CREATED).json(userResponse);
+      });
+    } else {
+      // Remove informações sensíveis
+      const userResponse = { ...newUser[0] };
+      delete userResponse.password;
+      
+      return res.status(HTTP_STATUS.CREATED).json(userResponse);
     }
-
-    // Remove informações sensíveis
-    delete newUser[0].password;
-
-    return res.status(HTTP_STATUS.CREATED).json(newUser[0]);
   } catch (error) {
     console.error('Erro no registro:', error);
     return res.status(HTTP_STATUS.INTERNAL_ERROR).json({
@@ -181,12 +194,25 @@ export async function login(req: Request, res: Response) {
         name: user.name,
         role: user.role,
       };
+      
+      req.session.save((err) => {
+        if (err) {
+          console.error('Erro ao salvar sessão após login:', err);
+        }
+        
+        // Remove informações sensíveis
+        const userResponse = { ...user };
+        delete userResponse.password;
+        
+        return res.status(HTTP_STATUS.OK).json(userResponse);
+      });
+    } else {
+      // Remove informações sensíveis
+      const userResponse = { ...user };
+      delete userResponse.password;
+      
+      return res.status(HTTP_STATUS.OK).json(userResponse);
     }
-
-    // Remove informações sensíveis
-    delete user.password;
-
-    return res.status(HTTP_STATUS.OK).json(user);
   } catch (error) {
     console.error('Erro no login:', error);
     return res.status(HTTP_STATUS.INTERNAL_ERROR).json({
@@ -270,9 +296,10 @@ export async function getCurrentUser(req: Request, res: Response) {
     const user = userRecord[0];
 
     // Remove informações sensíveis
-    delete user.password;
+    const userResponse = { ...user };
+    delete userResponse.password;
 
-    return res.status(HTTP_STATUS.OK).json(user);
+    return res.status(HTTP_STATUS.OK).json(userResponse);
   } catch (error) {
     console.error('Erro ao buscar usuário atual:', error);
     return res.status(HTTP_STATUS.INTERNAL_ERROR).json({
