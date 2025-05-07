@@ -1,5 +1,9 @@
+import { SUPABASE_TABLES } from './supabase-tables';
+
 // API Base URL
 export const API_BASE_URL = '/api';
+
+export { SUPABASE_TABLES };
 
 // API Endpoints
 export const API_ENDPOINTS = {
