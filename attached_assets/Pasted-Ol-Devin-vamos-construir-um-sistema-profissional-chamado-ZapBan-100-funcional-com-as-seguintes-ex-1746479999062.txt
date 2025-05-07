@@ -1,0 +1,143 @@
+Olá Devin, vamos construir um sistema profissional chamado ZapBan 100% funcional com as seguintes exigências:
+
+✅ OBJETIVO
+Criar um sistema SaaS completo de atendimento via WhatsApp baseado na API Baileys, com gerenciamento de múltiplas instâncias, painel do cliente e painel administrativo. Ele deve estar pronto para comercialização, visualmente profissional e com código limpo e modular.
+
+📌 SUPABASE (banco de dados principal)
+Projeto Supabase já está criado:
+
+Project URL: https://gqjfbdqgcjvdnbvcupcf.supabase.co
+
+API Key Anon (public):
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0MDAzNjksImV4cCI6MjA2MTk3NjM2OX0.x-hqQJYG2dcdmAxu6MGdWEdUFI3GjffxGBvzat2oAX4
+
+Service Role Key:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQwMDM2OSwiZXhwIjoyMDYxOTc2MzY5fQ.wI3QXmtlkUlNjBHsd-HPlbQfQF0fX0sysoNoOYviqHo
+
+Já existem tabelas criadas, mas pode criar, excluir ou ajustar conforme necessário.
+
+⚙️ FUNCIONALIDADES OBRIGATÓRIAS
+Conexão com WhatsApp via API Baileys
+
+Cada usuário pode criar uma única instância
+
+Geração de QR Code funcional e estável
+
+Reconexão automática e suave
+
+Exibir status da instância (conectado / desconectado)
+
+Permitir editar, deletar e reconectar instância
+
+Chat em Tempo Real
+
+Puxar mensagens reais da instância conectada
+
+Mostrar mensagens em tempo real (WebSocket ou Supabase Realtime)
+
+Suporte a envio/recebimento de:
+
+Texto
+
+Imagem
+
+Vídeo
+
+Áudio
+
+Documentos (PDF, etc.)
+
+Suporte a emojis
+
+Visual moderno, bolhas de conversa, separador de data
+
+Administração
+
+Painel administrativo completo
+
+Ações:
+
+Ver lista de usuários
+
+Ativar/desativar usuários
+
+Visualizar e gerenciar instâncias
+
+Estatísticas básicas
+
+Integração com Hotmart (Webhook)
+
+Criar usuário automaticamente após a compra
+
+Ativar ou desativar conta conforme status do pedido
+
+Endpoint seguro com validação de dados
+
+Registros de evento de webhook
+
+Login e Cadastro
+
+Login por e-mail e senha
+
+Esqueci minha senha (recuperação via e-mail ou redefinição básica)
+
+Painel de login elegante
+
+Internacionalização
+
+Sistema 100% em Português (pt-BR)
+
+Suporte para inglês (en-US)
+
+Detecção automática do navegador
+
+Botão para trocar o idioma
+
+Salvar idioma preferido (localStorage)
+
+Design Profissional
+
+Design responsivo: desktop, tablet e mobile
+
+Visual fora da curva, moderno, elegante e minimalista
+
+Inspiração: WhatsApp Web + Dashboard limpo tipo Linear, Notion, Intercom
+
+Menu lateral (Sidebar) com animações
+
+Layout de carregamento suave
+
+Login e painel com estética de alto nível
+
+🛠️ ARQUITETURA
+Frontend: React + Tailwind + Vite
+
+Backend: Node.js + Express.js
+
+Banco de Dados: Supabase
+
+Autenticação: Supabase Auth
+
+WhatsApp API: @whiskeysockets/baileys
+
+Webhook: Hotmart
+
+🧪 REQUISITOS DE ENTREGA
+✅ Projeto funcional rodando 100% na máquina local
+
+✅ Versão pronta para subir em VPS ou Vercel
+
+✅ Estrutura de código clara, modular e fácil de manter
+
+✅ Sem dependência de código antigo
+
+✅ Versão limpa para comercializar
+
+✅ Enviar projeto completo por:
+
+GitHub (privado ou público)
+
+Ou ZIP (.tar.gz)
+
+🔒 IMPORTANTE: O QR Code não deve gerar várias vezes por segundo. Ele deve aparecer de forma suave e controlada, com expiração e retry configurados.
+

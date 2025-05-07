@@ -1,0 +1,1 @@
+import * as baileys from '@whiskeysockets/baileys'; console.log('makeWASocket:', typeof baileys.default); try { const sock = baileys.default({}); console.log('Successfully initialized socket:', typeof sock); } catch(e) { console.error('Error:', e.message); }

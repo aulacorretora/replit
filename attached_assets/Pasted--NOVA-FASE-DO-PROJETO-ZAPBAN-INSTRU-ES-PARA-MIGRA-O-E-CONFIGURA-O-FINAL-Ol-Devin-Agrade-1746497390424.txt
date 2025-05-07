@@ -1,0 +1,72 @@
+📦 NOVA FASE DO PROJETO ZAPBAN – INSTRUÇÕES PARA MIGRAÇÃO E CONFIGURAÇÃO FINAL
+
+Olá, Devin! Agradeço pelo avanço até aqui, a interface está ficando excelente.
+
+Agora precisamos migrar tudo para a VPS oficial e alinhar toda a estrutura com o Supabase e GitHub, evitando conflitos. Abaixo estão as instruções completas e os acessos para que você possa:
+
+✅ AÇÕES SOLICITADAS
+Apagar tudo da VPS atual (/var/www, contêineres, arquivos antigos etc.)
+
+Clonar o projeto do novo repositório GitHub
+
+Alinhar toda a estrutura com o Supabase
+
+Rodar o sistema em produção com domínio ativo (zapban.com)
+
+Certificar que o sistema WhatsApp via Baileys funciona normalmente na VPS (e não apenas no Replit)
+
+🔑 ACESSOS E CREDENCIAIS
+💻 Plataforma ZapBan
+URL: https://zapban.com
+
+Login: wellnessa13@gmail.com
+
+Senha: 12345678
+
+🗄️ Supabase
+URL: https://supabase.com/dashboard/sign-in
+
+Projeto: ZapBan
+
+Login: seguewell@gmail.com
+
+Senha: Y^H[LV<5syZ\u}c'
+
+API Settings:
+URL: https://mopdlsgtfddzqjjerecz.supabase.co
+
+Anon Key:
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vcGRsc2d0ZmRkenFqamVyZWN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1NjEwMDMsImV4cCI6MjA1ODEzNzAwM30.V8siUExiTOwKTqpIUEfgjJeDAeetORbf3pG8Nn4OgyA
+
+
+🐙 GitHub
+Repositório: https://github.com/aulacorretora/replit
+
+Login: aulacorretora2023@gmail.com
+
+Senha: YH@c2%PL1"DZWrCd
+
+🖥️ VPS - Hospedagem da ZapBan
+IP: 212.85.22.36
+
+Porta: 22
+
+Usuário: root
+
+Senha: mDwjP$@"@UJnt7Q/
+
+⚠️ Importante – WhatsApp / Baileys
+Atualmente o QR Code aparece, mas a conexão trava em “Logging in...” no celular. Isso indica que o socket não está mantendo a sessão ativa com o WhatsApp Web. Verifique:
+
+Porta 443 e WebSocket estão liberadas e em uso
+
+Sessão do makeWASocket() está reagindo corretamente ao evento connection.update com status open
+
+O VPS tem acesso direto à internet sem bloqueios para os domínios do WhatsApp
+
+WebSocket está ligado corretamente ao frontend (evento chegando ao usuário logado)
+
+📌 Se precisar de qualquer coisa adicional, posso ajustar o banco ou os endpoints com você. Pode seguir com esses ajustes por favor? 🙏
+
+

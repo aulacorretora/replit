@@ -1,0 +1,59 @@
+🛠️ PRONT: Correções críticas no sistema ZapBan
+1. 🧠 Menu Chat
+Erro: A rota /chat está vazia (tela preta).
+
+Correção necessária: Fazer o componente do Chat carregar corretamente e puxar a instância conectada do Supabase automaticamente, conforme o user_id.
+
+2. 📲 Instâncias (rota /instances)
+Erro: As instâncias não estão mais sendo salvas no Supabase.
+
+Erro 2: O botão “Criar Nova Instância” não está criando nem disparando geração de QR Code.
+
+Correção necessária:
+
+Garantir que o botão crie a linha no Supabase (tabela whatsapp_instances) com o nome e ID do usuário.
+
+Fazer a requisição POST para a função edge whatsapp-connect.
+
+Exibir o QR Code gerado corretamente dentro da interface, usando o ID da instância.
+
+3. 🤖 Agentes de IA (/ai-agents)
+Erro: Página apresenta mensagem “Erro ao carregar assistentes”.
+
+Correção necessária: Corrigir a query de leitura dos assistentes do Supabase (ou ver conexão/API quebrou).
+
+4. ⚙️ Automação (/automations)
+Erro 1: Não é possível salvar o fluxo criado (botão “Salvar” não funciona).
+
+Erro 2: Ao arrastar alguns componentes (como Mensagem, Áudio, etc), a tela dá erro e reseta.
+
+Correção necessária:
+
+Implementar corretamente a persistência de fluxos no Supabase.
+
+Corrigir o bug de drag & drop que quebra a tela.
+
+Incluir funcionalidade de deletar blocos.
+
+Garantir que todos os componentes funcionem e sejam testáveis individualmente.
+
+5. 🔑 API Keys (/api-keys)
+Erro: “Erro ao carregar chaves API”.
+
+Correção necessária: Corrigir chamada para a tabela de chaves no Supabase.
+
+6. 📊 Analytics (/analytics)
+Erro: “404 Page Not Found”.
+
+Correção necessária: Criar a rota no router, mesmo que como placeholder. A tela precisa carregar algo, nem que seja “Em desenvolvimento”.
+
+📌 Observações Finais
+⚠️ Não quebrar o que já está funcionando! As partes estáveis do projeto devem ser mantidas.
+
+📦 Supabase já está conectado:
+
+URL: https://mopdlsgtfddzqjjerecz.supabase.co
+
+Anon Key já inserida no projeto.
+
+Usuário logado está correto e visível no sistema.
