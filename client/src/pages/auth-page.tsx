@@ -70,11 +70,19 @@ const AuthPage = () => {
   // Função para lidar com o login
   const handleLogin = (data: z.infer<typeof loginSchema>) => {
     console.log("Tentando fazer login com:", { email: data.email, password: "***" });
-    loginMutation.mutate(data, {
-      onError: (error) => {
-        console.error("Erro durante login:", error);
-      }
-    });
+    try {
+      console.log("Iniciando mutação de login");
+      loginMutation.mutate(data, {
+        onError: (error: Error) => {
+          console.error("Erro durante login:", error);
+        },
+        onSuccess: (userData: any) => {
+          console.log("Login bem-sucedido:", userData);
+        }
+      });
+    } catch (err) {
+      console.error("Exceção ao tentar login:", err);
+    }
   };
 
   // Função para lidar com o registro

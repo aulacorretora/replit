@@ -5,10 +5,11 @@ import {
   UseMutationResult,
 } from "@tanstack/react-query";
 import { z } from "zod";
-import { useToast } from "@/hooks/use-toast";
-import { API_ENDPOINTS } from "@/lib/constants";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { User } from "@shared/schema";
+import React from "react";
+import { useToast } from "./use-toast";
+import { API_ENDPOINTS } from "../lib/constants";
+import { apiRequest, queryClient } from "../lib/queryClient";
+import { User } from "../../../shared/schema";
 
 // Esquemas de validação
 export const loginSchema = z.object({
@@ -91,12 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryFn: async () => {
       try {
         const res = await apiRequest('GET', API_ENDPOINTS.USER, undefined, {
-          headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Credentials': 'include'
-          },
-          credentials: 'include'
+            'Pragma': 'no-cache'
         });
         if (res.ok) {
           const userData = await res.json();
@@ -123,11 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
       const res = await apiRequest('POST', API_ENDPOINTS.LOGIN, credentials, {
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Credentials': 'include'
-        }
+          'Content-Type': 'application/json'
       });
       if (!res.ok) {
         const errorData = await res.json();
@@ -145,12 +138,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await new Promise(resolve => setTimeout(resolve, 500));
         
         const sessionCheck = await apiRequest('GET', API_ENDPOINTS.USER, undefined, {
-          credentials: 'include',
-          headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Credentials': 'include'
-          }
+            'Pragma': 'no-cache'
         });
         
         if (sessionCheck.ok) {
@@ -190,11 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
       
       const res = await apiRequest('POST', API_ENDPOINTS.REGISTER, formData, {
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Credentials': 'include'
-        }
+          'Content-Type': 'application/json'
       });
       if (!res.ok) {
         const errorData = await res.json();
@@ -212,12 +197,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await new Promise(resolve => setTimeout(resolve, 500));
         
         const sessionCheck = await apiRequest('GET', API_ENDPOINTS.USER, undefined, {
-          credentials: 'include',
-          headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Credentials': 'include'
-          }
+            'Pragma': 'no-cache'
         });
         
         if (sessionCheck.ok) {
@@ -250,12 +231,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mutation para logout
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest('POST', API_ENDPOINTS.LOGOUT, undefined, {
-        credentials: 'include',
-        headers: {
-          'Credentials': 'include'
-        }
-      });
+      const res = await apiRequest('POST', API_ENDPOINTS.LOGOUT, undefined, {});
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || 'Erro ao fazer logout');
@@ -284,11 +260,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const forgotPasswordMutation = useMutation({
     mutationFn: async (data: ForgotPasswordData) => {
       const res = await apiRequest('POST', API_ENDPOINTS.FORGOT_PASSWORD, data, {
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Credentials': 'include'
-        }
+          'Content-Type': 'application/json'
       });
       if (!res.ok) {
         const errorData = await res.json();
@@ -314,11 +286,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const resetPasswordMutation = useMutation({
     mutationFn: async (data: ResetPasswordData) => {
       const res = await apiRequest('POST', API_ENDPOINTS.RESET_PASSWORD, data, {
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Credentials': 'include'
-        }
+          'Content-Type': 'application/json'
       });
       if (!res.ok) {
         const errorData = await res.json();
