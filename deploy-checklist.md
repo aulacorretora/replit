@@ -90,6 +90,7 @@ cat > /var/www/zapban/.env << EOL
 DATABASE_URL=postgres://postgres.[ID_PROJETO]:password@db.[ID_PROJETO].supabase.co:5432/postgres
 SUPABASE_URL=https://mopdlsgtfddzqjjerecz.supabase.co
 SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 SESSION_SECRET=zapban_session_secret_key_change_in_production
 NODE_ENV=production
 EOL

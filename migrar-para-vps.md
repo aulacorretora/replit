@@ -94,6 +94,7 @@ cat > /var/www/zapban/.env << EOL
 DATABASE_URL=postgres://postgres.[ID_DO_PROJETO]:password@db.[ID_DO_PROJETO].supabase.co:5432/postgres
 SUPABASE_URL=https://mopdlsgtfddzqjjerecz.supabase.co
 SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vcGRsc2d0ZmRkenFqamVyZWN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1NjEwMDMsImV4cCI6MjA1ODEzNzAwM30.V8siUExiTOwKTqpIUEfgjJeDAeetORbf3pG8Nn4OgyA
+SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 SESSION_SECRET=zapban_session_secret_key_change_me_in_production
 EOL
 
