@@ -8,7 +8,7 @@ import { HTTP_STATUS, ERROR_TYPES } from '../lib/constants';
 
 // Cria client do Supabase
 const supabaseUrl = process.env.SUPABASE_URL || 'https://gqjfbdqgcjvdnbvcupcf.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQwMDM2OSwiZXhwIjoyMDYxOTc2MzY5fQ.wI3QXmtlkUlNjBHsd-HPlbQfQF0fX0sysoNoOYviqHo';
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
 // Verificação ampla para permitir o sistema funcionar mesmo sem Supabase configurado
 let supabase: any = null;
