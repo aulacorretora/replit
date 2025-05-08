@@ -328,7 +328,7 @@ class WebSocketClient {
     }
 
     // Otherwise fetch the user data from the API
-    fetch('/api/auth/user', { 
+    fetch('https://zapban.com/api/auth/user', { 
       credentials: 'include',
       headers: {
         'Accept': 'application/json',

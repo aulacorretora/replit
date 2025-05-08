@@ -7,8 +7,8 @@ import { eq } from 'drizzle-orm';
 import { HTTP_STATUS, ERROR_TYPES } from '../lib/constants';
 
 // Cria client do Supabase
-const supabaseUrl = process.env.SUPABASE_URL || 'https://mopdlsgtfddzqjjerecz.supabase.co';
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseUrl = process.env.SUPABASE_URL || 'https://gqjfbdqgcjvdnbvcupcf.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
 // Verificação ampla para permitir o sistema funcionar mesmo sem Supabase configurado
 let supabase: any = null;
@@ -93,15 +93,13 @@ export async function register(req: Request, res: Response) {
         }
         
         // Remove informações sensíveis
-        const userResponse = { ...newUser[0] };
-        delete userResponse.password;
+        const { password, ...userResponse } = newUser[0];
         
         return res.status(HTTP_STATUS.CREATED).json(userResponse);
       });
     } else {
       // Remove informações sensíveis
-      const userResponse = { ...newUser[0] };
-      delete userResponse.password;
+      const { password, ...userResponse } = newUser[0];
       
       return res.status(HTTP_STATUS.CREATED).json(userResponse);
     }
@@ -201,15 +199,13 @@ export async function login(req: Request, res: Response) {
         }
         
         // Remove informações sensíveis
-        const userResponse = { ...user };
-        delete userResponse.password;
+        const { password, ...userResponse } = user;
         
         return res.status(HTTP_STATUS.OK).json(userResponse);
       });
     } else {
       // Remove informações sensíveis
-      const userResponse = { ...user };
-      delete userResponse.password;
+      const { password, ...userResponse } = user;
       
       return res.status(HTTP_STATUS.OK).json(userResponse);
     }
@@ -296,8 +292,7 @@ export async function getCurrentUser(req: Request, res: Response) {
     const user = userRecord[0];
 
     // Remove informações sensíveis
-    const userResponse = { ...user };
-    delete userResponse.password;
+    const { password, ...userResponse } = user;
 
     return res.status(HTTP_STATUS.OK).json(userResponse);
   } catch (error) {

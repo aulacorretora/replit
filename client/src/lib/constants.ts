@@ -112,5 +112,9 @@ export const WS_EVENTS = {
   INSTANCE_DISCONNECTED: 'instance_disconnected',
   QR_RECEIVED: 'qr_received',
   PAIRING_CODE: 'pairing_code',
-  LOADING: 'loading'
+  LOADING: 'loading',
+  INSTANCE_STATUS: 'instance_status',
+  QR_CODE: 'qr_code',
+  QR: 'qr',
+  MESSAGE_STATUS: 'message_status'
 };
