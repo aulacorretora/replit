@@ -106,7 +106,7 @@ export const broadcastToUser = global.broadcastToUser;
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Registrar rotas para API
-  app.use('/api/auth', authRoutes);
+  app.use('/api/auth', authRoutes);  // Rotas de autenticação
   app.use('/api/admin', adminRoutes);
   app.use('/api/instances', instanceRoutes);
   app.use('/api/chats', chatRoutes);
@@ -260,16 +260,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // As rotas de autenticação são registradas em server/auth.ts no setupAuth
-  // Estas são as rotas secundárias
-  app.use('/api/admin', adminRoutes);
-  app.use('/api/instances', instanceRoutes);
-  app.use('/api/chats', chatRoutes);
-  app.use('/api/webhooks', webhookRoutes);
-  
-  // Registrar rotas para agentes de IA, automações e chaves de API
-  app.use(aiAgentRoutes);
-  app.use(automationRoutes);
-  app.use(apiKeyRoutes);
   
   // Registro para monitoramento das rotas de autenticação (apenas para debug em desenvolvimento)
   if (process.env.NODE_ENV !== 'production') {
