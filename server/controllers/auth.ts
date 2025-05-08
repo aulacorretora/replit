@@ -8,17 +8,18 @@ import { HTTP_STATUS, ERROR_TYPES } from '../lib/constants';
 
 // Cria client do Supabase
 const supabaseUrl = process.env.SUPABASE_URL || 'https://gqjfbdqgcjvdnbvcupcf.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQwMDM2OSwiZXhwIjoyMDYxOTc2MzY5fQ.wI3QXmtlkUlNjBHsd-HPlbQfQF0fX0sysoNoOYviqHo';
 
 // Verificação ampla para permitir o sistema funcionar mesmo sem Supabase configurado
 let supabase: any = null;
 
 try {
   if (supabaseKey) {
+    console.log('Inicializando Supabase client com URL:', supabaseUrl);
     supabase = createClient(supabaseUrl, supabaseKey);
     console.log('Supabase client inicializado com sucesso');
   } else {
-    console.warn('SUPABASE_KEY não está definido. Funcionalidades do Supabase estarão desabilitadas.');
+    console.error('SUPABASE_SERVICE_KEY não está definido. Funcionalidades do Supabase estarão desabilitadas.');
   }
 } catch (error) {
   console.error('Erro ao inicializar cliente Supabase:', error);
@@ -145,15 +146,23 @@ export async function login(req: Request, res: Response) {
     // Autentica no Supabase (se disponível)
     if (supabase) {
       try {
+        console.log(`Tentando autenticar usuário ${email} no Supabase...`);
         const { data: supabaseSession, error: supabaseError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
         if (supabaseError) {
-          console.warn('Erro ao autenticar no Supabase:', supabaseError);
+          console.error('Erro ao autenticar no Supabase:', {
+            message: supabaseError.message,
+            status: supabaseError.status,
+            code: supabaseError.code,
+            details: supabaseError.details
+          });
+          
           // Se o usuário existe no banco local mas não no Supabase, tenta criá-lo no Supabase
           if (supabaseError.status === 400) {
+            console.log(`Usuário ${email} não encontrado no Supabase. Tentando criar...`);
             try {
               const { data: supabaseUser, error: createError } = await supabase.auth.signUp({
                 email,
@@ -166,15 +175,24 @@ export async function login(req: Request, res: Response) {
               });
 
               if (createError) {
-                console.warn('Erro ao criar usuário no Supabase:', createError);
+                console.error('Erro ao criar usuário no Supabase:', {
+                  message: createError.message,
+                  status: createError.status,
+                  code: createError.code,
+                  details: createError.details
+                });
+              } else {
+                console.log(`Usuário ${email} criado com sucesso no Supabase`);
               }
-            } catch (createError) {
-              console.warn('Exceção ao criar usuário no Supabase:', createError);
+            } catch (createError: any) {
+              console.error('Exceção ao criar usuário no Supabase:', createError?.message || createError);
             }
           }
+        } else {
+          console.log(`Usuário ${email} autenticado com sucesso no Supabase`);
         }
-      } catch (error) {
-        console.warn('Exceção ao autenticar no Supabase:', error);
+      } catch (error: any) {
+        console.error('Exceção ao autenticar no Supabase:', error?.message || error);
         // Continuamos mesmo com erro no Supabase
       }
     }
