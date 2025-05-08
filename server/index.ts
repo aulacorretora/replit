@@ -41,17 +41,17 @@ app.use((req, res, next) => {
 });
 
 // Diretorios para upload são configurados no módulo lib/upload
-
-// Para desenvolvimento apenas, registra as sessões
 app.use((req, res, next) => {
   if (process.env.NODE_ENV !== 'production' && req.path.startsWith('/api/auth/')) {
     console.log(`${req.method} ${req.path} - Session ID: ${req.sessionID || 'undefined'}`);
     
     // Verificar se req.session existe antes de acessá-lo
     if (req.session) {
-      console.log('Session data:', req.session);
+      console.log('Session data:', JSON.stringify(req.session));
       if (req.session.user) {
         console.log('User in session:', req.session.user.id, req.session.user.email);
+      } else if (req.session.passport && req.session.passport.user) {
+        console.log('User ID in passport session:', req.session.passport.user);
       }
     } else {
       console.log('Session data: undefined (session middleware ainda não foi inicializado)');
