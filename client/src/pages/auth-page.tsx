@@ -79,9 +79,12 @@ const AuthPage = () => {
         },
         onSuccess: (userData: any) => {
           console.log("Login bem-sucedido:", userData);
-          setTimeout(() => {
-            window.location.href = '/dashboard';
-          }, 500);
+          console.log("Salvando dados do usuário no localStorage");
+          localStorage.setItem('zapban_user', JSON.stringify(userData));
+          localStorage.setItem('userId', userData.id.toString());
+          
+          console.log("Redirecionando para dashboard...");
+          window.location.href = '/dashboard';
         }
       });
     } catch (err) {
@@ -142,7 +145,13 @@ const AuthPage = () => {
               <CardContent>
                 <Form {...loginForm}>
                   <form 
-                    onSubmit={loginForm.handleSubmit(handleLogin)} 
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      console.log("Form submitted");
+                      const values = loginForm.getValues();
+                      console.log("Form values:", values);
+                      handleLogin(values);
+                    }} 
                     className="space-y-4"
                   >
                     <FormField
@@ -184,6 +193,9 @@ const AuthPage = () => {
                       type="submit" 
                       className="w-full"
                       disabled={loginMutation.isPending}
+                      onClick={() => {
+                        console.log("Login button clicked");
+                      }}
                     >
                       {loginMutation.isPending ? (
                         <>
