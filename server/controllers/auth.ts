@@ -8,7 +8,7 @@ import { HTTP_STATUS, ERROR_TYPES } from '../lib/constants';
 
 // Cria client do Supabase
 const supabaseUrl = process.env.SUPABASE_URL || 'https://gqjfbdqgcjvdnbvcupcf.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+const supabaseKey = process.env.SUPABASE_KEY;
 
 // Verificação ampla para permitir o sistema funcionar mesmo sem Supabase configurado
 let supabase: any = null;
@@ -45,6 +45,7 @@ export async function register(req: Request, res: Response) {
     // Cria o usuário no Supabase (se disponível)
     if (supabase) {
       try {
+        console.log(`Tentando criar usuário ${email} no Supabase...`);
         const { data: supabaseUser, error: supabaseError } = await supabase.auth.signUp({
           email,
           password,
@@ -56,11 +57,37 @@ export async function register(req: Request, res: Response) {
         });
 
         if (supabaseError) {
-          console.warn('Erro ao criar usuário no Supabase:', supabaseError);
-          // Continuamos mesmo com erro no Supabase
+          console.error('Erro ao criar usuário no Supabase:', {
+            message: supabaseError.message,
+            status: supabaseError.status,
+            code: supabaseError.code,
+            details: supabaseError.details
+          });
+          try {
+            const { data, error } = await supabase.auth.admin.createUser({
+              email,
+              password,
+              user_metadata: { name },
+              email_confirm: true
+            });
+            if (error) {
+              console.error('Erro ao criar usuário via admin API:', {
+                message: error.message,
+                status: error.status,
+                code: error.code,
+                details: error.details
+              });
+            } else {
+              console.log(`Usuário ${email} criado com sucesso via admin API`);
+            }
+          } catch (adminError: any) {
+            console.error('Exceção ao criar usuário via admin API:', adminError?.message || adminError);
+          }
+        } else {
+          console.log(`Usuário ${email} criado com sucesso no Supabase`);
         }
-      } catch (error) {
-        console.warn('Exceção ao criar usuário no Supabase:', error);
+      } catch (error: any) {
+        console.error('Exceção ao criar usuário no Supabase:', error?.message || error);
         // Continuamos mesmo com erro no Supabase
       }
     }
@@ -164,25 +191,50 @@ export async function login(req: Request, res: Response) {
           if (supabaseError.status === 400) {
             console.log(`Usuário ${email} não encontrado no Supabase. Tentando criar...`);
             try {
-              const { data: supabaseUser, error: createError } = await supabase.auth.signUp({
+              const { data, error } = await supabase.auth.admin.createUser({
                 email,
-                password,
-                options: {
-                  data: {
-                    name: user.name,
-                  },
-                },
+                password, 
+                user_metadata: { name: user.name },
+                email_confirm: true
               });
-
-              if (createError) {
-                console.error('Erro ao criar usuário no Supabase:', {
-                  message: createError.message,
-                  status: createError.status,
-                  code: createError.code,
-                  details: createError.details
+              
+              if (error) {
+                console.error('Erro ao criar usuário via admin API:', {
+                  message: error.message,
+                  status: error.status,
+                  code: error.code,
+                  details: error.details
                 });
+                const { data: supabaseUser, error: createError } = await supabase.auth.signUp({
+                  email,
+                  password,
+                  options: {
+                    data: {
+                      name: user.name,
+                    },
+                  },
+                });
+
+                if (createError) {
+                  console.error('Erro ao criar usuário no Supabase:', {
+                    message: createError.message,
+                    status: createError.status,
+                    code: createError.code,
+                    details: createError.details
+                  });
+                } else {
+                  console.log(`Usuário ${email} criado com sucesso no Supabase`);
+                  await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                  });
+                }
               } else {
-                console.log(`Usuário ${email} criado com sucesso no Supabase`);
+                console.log(`Usuário ${email} criado com sucesso via admin API`);
+                await supabase.auth.signInWithPassword({
+                  email,
+                  password,
+                });
               }
             } catch (createError: any) {
               console.error('Exceção ao criar usuário no Supabase:', createError?.message || createError);

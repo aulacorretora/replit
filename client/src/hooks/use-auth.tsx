@@ -135,15 +135,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       return await res.json();
     },
-    onSuccess: (userData: User) => {
+    onSuccess: async (userData: User) => {
       queryClient.setQueryData([API_ENDPOINTS.USER], userData);
       // Salvar dados do usuário no localStorage
       localStorage.setItem('zapban_user', JSON.stringify(userData));
       localStorage.setItem('userId', userData.id.toString());
       
+      try {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const sessionCheck = await apiRequest('GET', API_ENDPOINTS.USER, undefined, {
+          credentials: 'include',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Credentials': 'include'
+          }
+        });
+        
+        if (sessionCheck.ok) {
+          console.log('Sessão verificada com sucesso');
+        } else {
+          console.warn('Falha ao verificar sessão, mas continuando redirecionamento');
+        }
+      } catch (err) {
+        console.error('Erro ao verificar sessão:', err);
+      }
+      
       setTimeout(() => {
         window.location.href = '/dashboard';
-      }, 1000);
+      }, 1500);
       
       toast({
         title: "Login realizado com sucesso",
@@ -181,15 +202,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       return await res.json();
     },
-    onSuccess: (userData: User) => {
+    onSuccess: async (userData: User) => {
       queryClient.setQueryData([API_ENDPOINTS.USER], userData);
       // Salvar dados do usuário no localStorage
       localStorage.setItem('zapban_user', JSON.stringify(userData));
       localStorage.setItem('userId', userData.id.toString());
       
+      try {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const sessionCheck = await apiRequest('GET', API_ENDPOINTS.USER, undefined, {
+          credentials: 'include',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Credentials': 'include'
+          }
+        });
+        
+        if (sessionCheck.ok) {
+          console.log('Sessão verificada com sucesso após registro');
+        } else {
+          console.warn('Falha ao verificar sessão após registro, mas continuando redirecionamento');
+        }
+      } catch (err) {
+        console.error('Erro ao verificar sessão após registro:', err);
+      }
+      
       setTimeout(() => {
         window.location.href = '/dashboard';
-      }, 1000);
+      }, 1500);
       
       toast({
         title: "Cadastro realizado com sucesso",

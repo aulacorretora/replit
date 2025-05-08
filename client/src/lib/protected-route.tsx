@@ -53,9 +53,54 @@ export function ProtectedRoute({
   // Se não estiver autenticado, redireciona para a página de login
   if (!user && !storedUser) {
     console.log('No user found in context or localStorage, redirecting to /auth');
+    
+    localStorage.removeItem('zapban_user');
+    localStorage.removeItem('userId');
+    
     setTimeout(() => {
       window.location.href = '/auth';
-    }, 100);
+    }, 1500); // Aumentado para 1500ms para consistência com outros redirecionamentos
+    
+    return (
+      <Route path={path}>
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </Route>
+    );
+  }
+  
+  if (!user && storedUser) {
+    console.log('User found in localStorage but not in context, verifying session...');
+    
+    useEffect(() => {
+      const verifySession = async () => {
+        try {
+          const res = await fetch('/api/auth/user', {
+            credentials: 'include',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+              'Credentials': 'include'
+            }
+          });
+          
+          if (!res.ok) {
+            console.warn('Session verification failed, redirecting to login');
+            localStorage.removeItem('zapban_user');
+            localStorage.removeItem('userId');
+            window.location.href = '/auth';
+          } else {
+            console.log('Session verified successfully');
+            window.location.reload();
+          }
+        } catch (err) {
+          console.error('Error verifying session:', err);
+        }
+      };
+      
+      verifySession();
+    }, []);
     
     return (
       <Route path={path}>
