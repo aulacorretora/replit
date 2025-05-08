@@ -76,7 +76,7 @@ export function ProtectedRoute({
     useEffect(() => {
       const verifySession = async () => {
         try {
-          const res = await fetch('/api/auth/user', {
+          const res = await fetch('https://zapban.com/api/auth/user', {
             credentials: 'include',
             headers: {
               'Cache-Control': 'no-cache, no-store, must-revalidate',
