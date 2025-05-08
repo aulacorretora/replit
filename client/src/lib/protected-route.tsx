@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import { Redirect, Route } from "wouter";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 
 interface ProtectedRouteProps {
   path: string;
@@ -14,33 +14,67 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth();
   const [localLoading, setLocalLoading] = useState(true);
-  
-  console.log('ProtectedRoute:', { path, user, isLoading, localLoading });
+  const [sessionVerified, setSessionVerified] = useState(false);
+  const [storedUser, setStoredUser] = useState<any>(null);
   
   useEffect(() => {
+    console.log('ProtectedRoute:', { path, user, isLoading, localLoading });
+    
+    try {
+      const stored = localStorage.getItem('zapban_user');
+      if (stored) {
+        setStoredUser(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error('Erro ao ler usuário do localStorage:', e);
+    }
+    
     if (!isLoading) {
       const timer = setTimeout(() => {
         setLocalLoading(false);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [isLoading]);
+  }, [isLoading, path, user]);
   
-  const storedUser = useMemo(() => {
-    if (!user) {
-      try {
-        const stored = localStorage.getItem('zapban_user');
-        return stored ? JSON.parse(stored) : null;
-      } catch (e) {
-        console.error('Erro ao ler usuário do localStorage:', e);
-        return null;
-      }
+  useEffect(() => {
+    if (!user && storedUser && !sessionVerified && !isLoading && !localLoading) {
+      console.log('User found in localStorage but not in context, verifying session...');
+      
+      const verifySession = async () => {
+        try {
+          const res = await fetch('/api/auth/user', {
+            credentials: 'include',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+              'Credentials': 'include'
+            }
+          });
+          
+          setSessionVerified(true);
+          
+          if (!res.ok) {
+            console.warn('Session verification failed, redirecting to login');
+            localStorage.removeItem('zapban_user');
+            localStorage.removeItem('userId');
+            window.location.href = '/auth';
+          } else {
+            console.log('Session verified successfully');
+            window.location.reload();
+          }
+        } catch (err) {
+          console.error('Error verifying session:', err);
+          setSessionVerified(true);
+        }
+      };
+      
+      verifySession();
     }
-    return null;
-  }, [user]);
+  }, [user, storedUser, sessionVerified, isLoading, localLoading]);
 
   // Se estiver carregando, mostra um loader
-  if (isLoading || localLoading) {
+  if (isLoading || localLoading || (!user && storedUser && !sessionVerified)) {
     return (
       <Route path={path}>
         <div className="flex items-center justify-center min-h-screen">
@@ -60,47 +94,6 @@ export function ProtectedRoute({
     return (
       <Route path={path}>
         <Redirect to="/auth" />
-      </Route>
-    );
-  }
-  
-  if (!user && storedUser) {
-    console.log('User found in localStorage but not in context, verifying session...');
-    
-    useEffect(() => {
-      const verifySession = async () => {
-        try {
-          const res = await fetch('/api/auth/user', {
-            credentials: 'include',
-            headers: {
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
-              'Pragma': 'no-cache',
-              'Credentials': 'include'
-            }
-          });
-          
-          if (!res.ok) {
-            console.warn('Session verification failed, redirecting to login');
-            localStorage.removeItem('zapban_user');
-            localStorage.removeItem('userId');
-            window.location.href = '/auth';
-          } else {
-            console.log('Session verified successfully');
-            window.location.reload();
-          }
-        } catch (err) {
-          console.error('Error verifying session:', err);
-        }
-      };
-      
-      verifySession();
-    }, []);
-    
-    return (
-      <Route path={path}>
-        <div className="flex items-center justify-center min-h-screen">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
       </Route>
     );
   }
