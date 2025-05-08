@@ -9,6 +9,7 @@ import session from "express-session";
 import passport from "passport";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { setupAuth } from "./auth";
 
 // Declarar o tipo da sessão para incluir o usuário
 declare module 'express-session' {
@@ -27,7 +28,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Diretorios para upload são configurados no módulo lib/upload
+setupAuth(app);
 
 // Para desenvolvimento apenas, registra as sessões
 app.use((req, res, next) => {
