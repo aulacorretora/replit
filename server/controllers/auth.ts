@@ -7,8 +7,8 @@ import { eq } from 'drizzle-orm';
 import { HTTP_STATUS, ERROR_TYPES } from '../lib/constants';
 
 // Cria client do Supabase
-const supabaseUrl = process.env.SUPABASE_URL || 'https://mopdlsgtfddzqjjerecz.supabase.co';
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseUrl = process.env.SUPABASE_URL || 'https://gqjfbdqgcjvdnbvcupcf.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
 // Verificação ampla para permitir o sistema funcionar mesmo sem Supabase configurado
 let supabase: any = null;
@@ -86,12 +86,23 @@ export async function register(req: Request, res: Response) {
         name: newUser[0].name,
         role: newUser[0].role,
       };
+      
+      req.session.save((err) => {
+        if (err) {
+          console.error('Erro ao salvar sessão após registro:', err);
+        }
+        
+        // Remove informações sensíveis
+        const { password, ...userResponse } = newUser[0];
+        
+        return res.status(HTTP_STATUS.CREATED).json(userResponse);
+      });
+    } else {
+      // Remove informações sensíveis
+      const { password, ...userResponse } = newUser[0];
+      
+      return res.status(HTTP_STATUS.CREATED).json(userResponse);
     }
-
-    // Remove informações sensíveis
-    delete newUser[0].password;
-
-    return res.status(HTTP_STATUS.CREATED).json(newUser[0]);
   } catch (error) {
     console.error('Erro no registro:', error);
     return res.status(HTTP_STATUS.INTERNAL_ERROR).json({
@@ -181,12 +192,23 @@ export async function login(req: Request, res: Response) {
         name: user.name,
         role: user.role,
       };
+      
+      req.session.save((err) => {
+        if (err) {
+          console.error('Erro ao salvar sessão após login:', err);
+        }
+        
+        // Remove informações sensíveis
+        const { password, ...userResponse } = user;
+        
+        return res.status(HTTP_STATUS.OK).json(userResponse);
+      });
+    } else {
+      // Remove informações sensíveis
+      const { password, ...userResponse } = user;
+      
+      return res.status(HTTP_STATUS.OK).json(userResponse);
     }
-
-    // Remove informações sensíveis
-    delete user.password;
-
-    return res.status(HTTP_STATUS.OK).json(user);
   } catch (error) {
     console.error('Erro no login:', error);
     return res.status(HTTP_STATUS.INTERNAL_ERROR).json({
@@ -270,9 +292,9 @@ export async function getCurrentUser(req: Request, res: Response) {
     const user = userRecord[0];
 
     // Remove informações sensíveis
-    delete user.password;
+    const { password, ...userResponse } = user;
 
-    return res.status(HTTP_STATUS.OK).json(user);
+    return res.status(HTTP_STATUS.OK).json(userResponse);
   } catch (error) {
     console.error('Erro ao buscar usuário atual:', error);
     return res.status(HTTP_STATUS.INTERNAL_ERROR).json({

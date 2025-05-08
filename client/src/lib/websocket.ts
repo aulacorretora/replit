@@ -19,6 +19,7 @@ class WebSocketClient {
   private connecting: boolean = false;
 
   constructor() {
+    const apiUrl = 'https://zapban.com';
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     
     // Tentar obter o userId do localStorage para incluir na URL de conexão
@@ -32,7 +33,7 @@ class WebSocketClient {
       console.error('Erro ao obter userId do localStorage:', err);
     }
     
-    this.url = `${protocol}//${window.location.host}/ws${userId}`;
+    this.url = `${protocol}//${apiUrl.replace(/^https?:\/\//, '')}/ws${userId}`;
   }
 
   connect(): void {
@@ -52,6 +53,7 @@ class WebSocketClient {
     console.log('Initiating WebSocket connection...');
     
     // Atualizar a URL com o userId mais recente
+    const apiUrl = 'https://zapban.com';
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     let userId = '';
     try {
@@ -62,7 +64,7 @@ class WebSocketClient {
     } catch (err) {
       console.error('Erro ao obter userId do localStorage para reconexão:', err);
     }
-    this.url = `${protocol}//${window.location.host}/ws${userId}`;
+    this.url = `${protocol}//${apiUrl.replace(/^https?:\/\//, '')}/ws${userId}`;
     
     // If socket is null or CLOSED, create a new one
     this.socket = new WebSocket(this.url);
@@ -292,7 +294,8 @@ class WebSocketClient {
           } catch (error) {
             console.error('Error sending heartbeat:', error);
             // Try to reconnect if error sending heartbeat
-            if (this.socket.readyState !== WebSocket.CONNECTING) {
+            if (this.socket && (this.socket.readyState === 1 || this.socket.readyState === 2 || this.socket.readyState === 3)) {
+              // If socket is OPEN (1), CLOSING (2) or CLOSED (3), but not CONNECTING (0)
               this.socket.close();
             }
           }
@@ -325,7 +328,7 @@ class WebSocketClient {
     }
 
     // Otherwise fetch the user data from the API
-    fetch('/api/auth/user', { 
+    fetch('https://zapban.com/api/auth/user', { 
       credentials: 'include',
       headers: {
         'Accept': 'application/json',

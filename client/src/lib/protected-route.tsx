@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import { Redirect, Route } from "wouter";
+import { useState, useEffect, useMemo } from "react";
 
 interface ProtectedRouteProps {
   path: string;
@@ -12,9 +13,34 @@ export function ProtectedRoute({
   component: Component,
 }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth();
+  const [localLoading, setLocalLoading] = useState(true);
+  
+  console.log('ProtectedRoute:', { path, user, isLoading, localLoading });
+  
+  useEffect(() => {
+    if (!isLoading) {
+      const timer = setTimeout(() => {
+        setLocalLoading(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
+  
+  const storedUser = useMemo(() => {
+    if (!user) {
+      try {
+        const stored = localStorage.getItem('zapban_user');
+        return stored ? JSON.parse(stored) : null;
+      } catch (e) {
+        console.error('Erro ao ler usuário do localStorage:', e);
+        return null;
+      }
+    }
+    return null;
+  }, [user]);
 
   // Se estiver carregando, mostra um loader
-  if (isLoading) {
+  if (isLoading || localLoading) {
     return (
       <Route path={path}>
         <div className="flex items-center justify-center min-h-screen">
@@ -25,14 +51,25 @@ export function ProtectedRoute({
   }
 
   // Se não estiver autenticado, redireciona para a página de login
-  if (!user) {
+  if (!user && !storedUser) {
+    console.log('No user found in context or localStorage, redirecting to /auth');
+    setTimeout(() => {
+      window.location.href = '/auth';
+    }, 100);
+    
     return (
       <Route path={path}>
-        <Redirect to="/auth" />
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
       </Route>
     );
   }
 
   // Se estiver autenticado, renderiza o componente
-  return <Route path={path} component={Component} />;
+  return (
+    <Route path={path}>
+      <Component />
+    </Route>
+  );
 }

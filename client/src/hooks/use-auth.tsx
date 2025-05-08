@@ -93,8 +93,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const res = await apiRequest('GET', API_ENDPOINTS.USER, undefined, {
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache'
-          }
+            'Pragma': 'no-cache',
+            'Credentials': 'include'
+          },
+          credentials: 'include'
         });
         if (res.ok) {
           const userData = await res.json();
@@ -106,6 +108,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           return userData;
         }
+        localStorage.removeItem('zapban_user');
+        localStorage.removeItem('userId');
         return null;
       } catch (err) {
         console.error('Erro ao buscar informações do usuário:', err);
@@ -118,7 +122,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mutation para login
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      const res = await apiRequest('POST', API_ENDPOINTS.LOGIN, credentials);
+      const res = await apiRequest('POST', API_ENDPOINTS.LOGIN, credentials, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Credentials': 'include'
+        }
+      });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || 'Erro ao fazer login');
@@ -130,6 +140,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Salvar dados do usuário no localStorage
       localStorage.setItem('zapban_user', JSON.stringify(userData));
       localStorage.setItem('userId', userData.id.toString());
+      
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1000);
+      
       toast({
         title: "Login realizado com sucesso",
         description: `Bem-vindo(a), ${userData.name}!`,
@@ -153,7 +168,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password: userData.password,
       };
       
-      const res = await apiRequest('POST', API_ENDPOINTS.REGISTER, formData);
+      const res = await apiRequest('POST', API_ENDPOINTS.REGISTER, formData, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Credentials': 'include'
+        }
+      });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || 'Erro ao cadastrar');
@@ -165,6 +186,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Salvar dados do usuário no localStorage
       localStorage.setItem('zapban_user', JSON.stringify(userData));
       localStorage.setItem('userId', userData.id.toString());
+      
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1000);
+      
       toast({
         title: "Cadastro realizado com sucesso",
         description: `Conta criada para ${userData.name}.`,
@@ -182,7 +208,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mutation para logout
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest('POST', API_ENDPOINTS.LOGOUT);
+      const res = await apiRequest('POST', API_ENDPOINTS.LOGOUT, undefined, {
+        credentials: 'include',
+        headers: {
+          'Credentials': 'include'
+        }
+      });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || 'Erro ao fazer logout');
@@ -210,7 +241,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mutation para recuperação de senha
   const forgotPasswordMutation = useMutation({
     mutationFn: async (data: ForgotPasswordData) => {
-      const res = await apiRequest('POST', API_ENDPOINTS.FORGOT_PASSWORD, data);
+      const res = await apiRequest('POST', API_ENDPOINTS.FORGOT_PASSWORD, data, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Credentials': 'include'
+        }
+      });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || 'Erro ao solicitar recuperação de senha');
@@ -234,7 +271,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mutation para redefinição de senha
   const resetPasswordMutation = useMutation({
     mutationFn: async (data: ResetPasswordData) => {
-      const res = await apiRequest('POST', API_ENDPOINTS.RESET_PASSWORD, data);
+      const res = await apiRequest('POST', API_ENDPOINTS.RESET_PASSWORD, data, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Credentials': 'include'
+        }
+      });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || 'Erro ao redefinir senha');

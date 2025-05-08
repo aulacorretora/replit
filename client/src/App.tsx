@@ -53,7 +53,11 @@ function AdminRoute({ path, component: Component }: { path: string, component: R
     );
   }
   
-  return <Route path={path} component={Component} />;
+  return (
+    <Route path={path}>
+      <Component />
+    </Route>
+  );
 }
 
 function Router() {
@@ -122,18 +126,39 @@ function WebSocketManager() {
   
   // Identify user when both websocket is available and user is authenticated
   useEffect(() => {
-    if (wsInstance && user && user.id && !hasIdentified) {
-      console.log(`Attempting to identify user ${user.id} with WebSocket`);
+    if (wsInstance && !hasIdentified) {
+      const storedUserId = localStorage.getItem('userId');
+      const userId = (user && user.id) || storedUserId;
       
-      // Add a small delay to ensure connection is established
-      const timer = setTimeout(() => {
-        // Only send if socket is ready
-        wsInstance.send('identify', { userId: user.id });
-        console.log(`WebSocket identified as user ${user.id}`);
-        setHasIdentified(true);
-      }, 1000);
-      
-      return () => clearTimeout(timer);
+      if (userId) {
+        console.log(`Attempting to identify user ${userId} with WebSocket (source: ${storedUserId ? 'localStorage' : 'context'})`);
+        
+        const timer = setTimeout(() => {
+          // Only send if socket is ready
+          try {
+            wsInstance.send('identify', { userId });
+            console.log(`WebSocket identified as user ${userId}`);
+            setHasIdentified(true);
+          } catch (err) {
+            console.error('Error identifying WebSocket user:', err);
+            setTimeout(() => {
+              if (wsInstance) {
+                try {
+                  wsInstance.send('identify', { userId });
+                  console.log(`WebSocket retry identification successful for user ${userId}`);
+                  setHasIdentified(true);
+                } catch (retryErr) {
+                  console.error('Retry identification failed:', retryErr);
+                }
+              }
+            }, 2000);
+          }
+        }, 2000);
+        
+        return () => clearTimeout(timer);
+      } else {
+        console.log('No user ID available for WebSocket identification');
+      }
     }
   }, [user, wsInstance, hasIdentified]); // Run when user or wsInstance changes
   
