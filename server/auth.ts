@@ -166,22 +166,17 @@ export function setupAuth(app: Express) {
         try {
           console.log(`Tentativa de login: ${email}`);
           
-          // Importar o cliente Supabase diretamente para evitar problemas de WebSocket
-          const { supabase } = await import('./db-direct');
+          // Buscar o usuário pelo email usando o banco de dados local
+          const [user] = await db
+            .select()
+            .from(users)
+            .where(eq(users.email, email));
           
-          // Buscar o usuário pelo email usando Supabase
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('email', email)
-            .single();
-          
-          if (userError || !userData) {
+          if (!user) {
             console.log(`Usuário não encontrado: ${email}`);
             return done(null, false, { message: "Email ou senha incorretos" });
           }
           
-          const user = userData;
           console.log(`Usuário encontrado: ${user.email} (ID: ${user.id})`);
           
           // Verificar senha
@@ -193,10 +188,14 @@ export function setupAuth(app: Express) {
           }
           
           // Atualizar a data do último login
-          const { error: updateError } = await supabase
-            .from('users')
-            .update({ last_login_at: new Date().toISOString() })
-            .eq('id', user.id);
+          try {
+            await db
+              .update(users)
+              .set({ lastLoginAt: new Date() })
+              .where(eq(users.id, user.id));
+          } catch (updateErr) {
+            console.warn(`Erro ao atualizar data de último login: ${updateErr}`);
+          }
           
           console.log(`Login bem-sucedido: ${user.email} (ID: ${user.id})`);
           

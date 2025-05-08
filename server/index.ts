@@ -5,6 +5,8 @@ import multer from "multer";
 import fs from "fs";
 import path from "path";
 import cors from "cors";
+import session from "express-session";
+import passport from "passport";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
@@ -26,7 +28,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Diretorios para upload são configurados no módulo lib/upload
-// Sessão é configurada em server/auth.ts
+
+// Para desenvolvimento apenas, registra as sessões
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    if (req.session) {
+      console.log(`Session ID: ${req.sessionID}`);
+    }
+  }
+  next();
+});
+
+// Diretorios para upload são configurados no módulo lib/upload
 
 // Para desenvolvimento apenas, registra as sessões
 app.use((req, res, next) => {

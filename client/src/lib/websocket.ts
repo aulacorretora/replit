@@ -19,7 +19,9 @@ class WebSocketClient {
   private connecting: boolean = false;
 
   constructor() {
-    const apiUrl = 'https://zapban.com';
+    const apiUrl = window.location.hostname === 'localhost' 
+      ? `${window.location.protocol}//${window.location.host}`
+      : 'https://zapban.com';
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     
     // Tentar obter o userId do localStorage para incluir na URL de conexão
@@ -34,6 +36,7 @@ class WebSocketClient {
     }
     
     this.url = `${protocol}//${apiUrl.replace(/^https?:\/\//, '')}/ws${userId}`;
+    console.log('WebSocket URL:', this.url);
   }
 
   connect(): void {
@@ -53,7 +56,9 @@ class WebSocketClient {
     console.log('Initiating WebSocket connection...');
     
     // Atualizar a URL com o userId mais recente
-    const apiUrl = 'https://zapban.com';
+    const apiUrl = window.location.hostname === 'localhost' 
+      ? `${window.location.protocol}//${window.location.host}`
+      : 'https://zapban.com';
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     let userId = '';
     try {
@@ -65,6 +70,7 @@ class WebSocketClient {
       console.error('Erro ao obter userId do localStorage para reconexão:', err);
     }
     this.url = `${protocol}//${apiUrl.replace(/^https?:\/\//, '')}/ws${userId}`;
+    console.log('Updated WebSocket URL:', this.url);
     
     // If socket is null or CLOSED, create a new one
     this.socket = new WebSocket(this.url);
@@ -328,7 +334,11 @@ class WebSocketClient {
     }
 
     // Otherwise fetch the user data from the API
-    fetch('https://zapban.com/api/auth/user', { 
+    const apiUrl = window.location.hostname === 'localhost' 
+      ? `${window.location.protocol}//${window.location.host}`
+      : 'https://zapban.com';
+    
+    fetch(`${apiUrl}/api/auth/user`, { 
       credentials: 'include',
       headers: {
         'Accept': 'application/json',

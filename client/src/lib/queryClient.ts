@@ -42,7 +42,9 @@ export async function apiRequest(
 
   // Usar a URL completa, garantindo que os endpoints da API sejam acessados corretamente
   // Não importa se a URL já tiver o prefixo /api, isso garante que sempre será o endereço correto
-  const apiBaseUrl = 'https://zapban.com';
+  const apiBaseUrl = window.location.hostname === 'localhost' 
+    ? `${window.location.protocol}//${window.location.host}`
+    : 'https://zapban.com';
   const fullUrl = url.startsWith('http') ? url : `${apiBaseUrl}${url}`;
 
   try {

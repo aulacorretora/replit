@@ -15,7 +15,7 @@ let supabase: any = null;
 
 try {
   if (supabaseKey) {
-    console.log('Inicializando Supabase client com URL:', supabaseUrl);
+    console.log(`Inicializando Supabase client com URL: ${supabaseUrl}`);
     supabase = createClient(supabaseUrl, supabaseKey);
     console.log('Supabase client inicializado com sucesso');
   } else {
@@ -171,13 +171,15 @@ export async function login(req: Request, res: Response) {
     }
 
     // Autentica no Supabase (se disponível)
+    let supabaseData = null;
     if (supabase) {
       try {
         console.log(`Tentando autenticar usuário ${email} no Supabase...`);
-        const { data: supabaseSession, error: supabaseError } = await supabase.auth.signInWithPassword({
+        const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
+        supabaseData = data;
 
         if (supabaseError) {
           console.error('Erro ao autenticar no Supabase:', {
@@ -262,6 +264,19 @@ export async function login(req: Request, res: Response) {
         name: user.name,
         role: user.role,
       };
+      
+      // Define a sessão do Supabase se disponível
+      if (supabase && supabaseData && supabaseData.session) {
+        try {
+          await supabase.auth.setSession({
+            access_token: supabaseData.session.access_token,
+            refresh_token: supabaseData.session.refresh_token
+          });
+          console.log("Sessão do Supabase definida com sucesso após login");
+        } catch (sessionError) {
+          console.error("Erro ao definir sessão do Supabase após login:", sessionError);
+        }
+      }
       
       req.session.save((err) => {
         if (err) {

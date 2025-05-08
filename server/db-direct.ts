@@ -9,15 +9,15 @@ const __dirname = dirname(__filename);
 const envPath = resolve(__dirname, '..', '.env');
 dotenv.config({ path: envPath });
 
-if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
   throw new Error(
-    "SUPABASE_URL and SUPABASE_ANON_KEY must be set in .env file",
+    "SUPABASE_URL and SUPABASE_SERVICE_KEY must be set in .env file",
   );
 }
 
 export const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
+  process.env.SUPABASE_SERVICE_KEY
 );
 
 export default supabase;
