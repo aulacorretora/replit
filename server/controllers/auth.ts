@@ -16,8 +16,14 @@ let supabase: any = null;
 try {
   if (supabaseKey) {
     console.log('Inicializando Supabase client com URL:', supabaseUrl);
+    console.log('Chave do Supabase configurada corretamente');
     supabase = createClient(supabaseUrl, supabaseKey);
-    console.log('Supabase client inicializado com sucesso');
+    
+    supabase.auth.getSession().then(() => {
+      console.log('Conexão com Supabase testada com sucesso');
+    }).catch((error: any) => {
+      console.error('Erro ao testar conexão com Supabase:', error?.message || error);
+    });
   } else {
     console.error('SUPABASE_SERVICE_KEY não está definido. Funcionalidades do Supabase estarão desabilitadas.');
   }
@@ -45,6 +51,7 @@ export async function register(req: Request, res: Response) {
     // Cria o usuário no Supabase (se disponível)
     if (supabase) {
       try {
+        console.log(`Tentando criar usuário ${email} no Supabase...`);
         const { data: supabaseUser, error: supabaseError } = await supabase.auth.signUp({
           email,
           password,
@@ -56,12 +63,24 @@ export async function register(req: Request, res: Response) {
         });
 
         if (supabaseError) {
-          console.warn('Erro ao criar usuário no Supabase:', supabaseError);
-          // Continuamos mesmo com erro no Supabase
+          console.error('Erro ao criar usuário no Supabase:', {
+            message: supabaseError.message,
+            status: supabaseError.status,
+            code: supabaseError.code,
+            details: supabaseError.details
+          });
+          return res.status(HTTP_STATUS.INTERNAL_ERROR).json({
+            type: ERROR_TYPES.SERVER_ERROR,
+            message: 'Erro ao criar usuário no Supabase: ' + supabaseError.message,
+          });
         }
-      } catch (error) {
-        console.warn('Exceção ao criar usuário no Supabase:', error);
-        // Continuamos mesmo com erro no Supabase
+        console.log(`Usuário ${email} criado com sucesso no Supabase`);
+      } catch (error: any) {
+        console.error('Exceção ao criar usuário no Supabase:', error?.message || error);
+        return res.status(HTTP_STATUS.INTERNAL_ERROR).json({
+          type: ERROR_TYPES.SERVER_ERROR,
+          message: 'Erro ao criar usuário no Supabase: ' + (error?.message || 'Erro desconhecido'),
+        });
       }
     }
 
@@ -175,25 +194,32 @@ export async function login(req: Request, res: Response) {
               });
 
               if (createError) {
-                console.error('Erro ao criar usuário no Supabase:', {
+                console.error('Erro ao criar usuário no Supabase durante login:', {
                   message: createError.message,
                   status: createError.status,
                   code: createError.code,
                   details: createError.details
                 });
+                // Continuamos com o login local mesmo se falhar criar no Supabase
+                console.log('Prosseguindo com login local apesar do erro no Supabase');
               } else {
                 console.log(`Usuário ${email} criado com sucesso no Supabase`);
               }
             } catch (createError: any) {
-              console.error('Exceção ao criar usuário no Supabase:', createError?.message || createError);
+              console.error('Exceção ao criar usuário no Supabase durante login:', createError?.message || createError);
+              // Continuamos com o login local
+              console.log('Prosseguindo com login local após exceção no Supabase');
             }
+          } else {
+            console.log('Erro de autenticação no Supabase não relacionado a usuário inexistente. Prosseguindo com login local.');
           }
         } else {
           console.log(`Usuário ${email} autenticado com sucesso no Supabase`);
         }
       } catch (error: any) {
         console.error('Exceção ao autenticar no Supabase:', error?.message || error);
-        // Continuamos mesmo com erro no Supabase
+        // Continuamos com o login local mesmo com erro no Supabase
+        console.log('Prosseguindo com login local após exceção na autenticação Supabase');
       }
     }
 
