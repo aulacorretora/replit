@@ -104,8 +104,6 @@ export const broadcast = global.broadcast;
 export const broadcastToUser = global.broadcastToUser;
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Configurar autenticação antes de qualquer outra rota
-  setupAuth(app);
   
   // Registrar rotas para API
   app.use('/api/auth', authRoutes);
