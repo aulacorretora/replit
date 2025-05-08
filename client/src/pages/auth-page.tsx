@@ -35,7 +35,8 @@ const AuthPage = () => {
   // Redirecionar se já estiver autenticado
   useEffect(() => {
     if (user) {
-      navigate("/");
+      console.log("Usuário autenticado, redirecionando para dashboard");
+      navigate("/dashboard");
     }
   }, [user, navigate]);
 
@@ -78,6 +79,9 @@ const AuthPage = () => {
         },
         onSuccess: (userData: any) => {
           console.log("Login bem-sucedido:", userData);
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 500);
         }
       });
     } catch (err) {

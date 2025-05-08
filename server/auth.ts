@@ -83,25 +83,15 @@ async function comparePasswords(supplied: string, stored: string): Promise<boole
 export function setupAuth(app: Express) {
   console.log('Configurando autenticação e sessão...');
   
-  // Usar armazenamento em memória para sessões durante o desenvolvimento
-  // e PostgreSQL em produção para persistência
+  // Usar armazenamento em memória para sessões para evitar problemas de conexão
   let sessionStore;
   
-  if (process.env.NODE_ENV === 'production') {
-    // Configurar a store de sessões para PostgreSQL em produção
-    const PostgresStore = connectPg(session);
-    sessionStore = new PostgresStore({
-      pool, 
-      createTableIfMissing: true,
-      tableName: 'user_sessions'
-    });
-    console.log('Usando PostgreSQL para armazenamento de sessões');
-  } else {
-    // Em desenvolvimento, usar MemoryStore para simplificar
-    const MemoryStore = session.MemoryStore;
-    sessionStore = new MemoryStore();
-    console.log('Usando MemoryStore para armazenamento de sessões');
-  }
+  console.log('Usando MemoryStore para armazenamento de sessões');
+  
+  // Em desenvolvimento, usar MemoryStore para simplificar
+  const MemoryStore = session.MemoryStore;
+  sessionStore = new MemoryStore();
+  console.log('Usando MemoryStore para armazenamento de sessões');
 
   // Definir uma SESSION_SECRET constante para garantir persistência
   // Importante: Esta mesma chave secreta deve ser usada no ambiente de produção
@@ -166,11 +156,11 @@ export function setupAuth(app: Express) {
         try {
           console.log(`Tentativa de login: ${email}`);
           
-          // Buscar o usuário pelo email usando o banco de dados local
-          const [user] = await db
-            .select()
-            .from(users)
-            .where(eq(users.email, email));
+          // Importar o módulo de autenticação mock
+          const { findUserByEmail, verifyPassword, updateLastLogin } = await import('./mock-auth');
+          
+          // Buscar o usuário pelo email usando o mock
+          const user = await findUserByEmail(email);
           
           if (!user) {
             console.log(`Usuário não encontrado: ${email}`);
@@ -180,7 +170,7 @@ export function setupAuth(app: Express) {
           console.log(`Usuário encontrado: ${user.email} (ID: ${user.id})`);
           
           // Verificar senha
-          const isPasswordValid = await comparePasswords(password, user.password);
+          const isPasswordValid = await verifyPassword(password, user.password);
           console.log(`Validação de senha: ${isPasswordValid ? 'sucesso' : 'falha'}`);
           
           if (!isPasswordValid) {
@@ -189,10 +179,7 @@ export function setupAuth(app: Express) {
           
           // Atualizar a data do último login
           try {
-            await db
-              .update(users)
-              .set({ lastLoginAt: new Date() })
-              .where(eq(users.id, user.id));
+            await updateLastLogin(user.id);
           } catch (updateErr) {
             console.warn(`Erro ao atualizar data de último login: ${updateErr}`);
           }
@@ -200,7 +187,9 @@ export function setupAuth(app: Express) {
           console.log(`Login bem-sucedido: ${user.email} (ID: ${user.id})`);
           
           // Login bem-sucedido
-          return done(null, user);
+          // Remover a senha antes de salvar na sessão
+          const { password: _password, ...userWithoutPassword } = user;
+          return done(null, userWithoutPassword as any);
         } catch (err) {
           console.error('Erro na autenticação:', err);
           return done(err);
@@ -217,9 +206,25 @@ export function setupAuth(app: Express) {
   // Deserializar usuário da sessão
   passport.deserializeUser(async (id: number, done) => {
     try {
-      const [user] = await db.select().from(users).where(eq(users.id, id));
-      done(null, user);
+      console.log(`Deserializando usuário com ID: ${id}`);
+      // Importar o módulo de autenticação mock
+      const { findUserById } = await import('./mock-auth');
+      
+      // Buscar o usuário pelo ID usando o mock
+      const user = await findUserById(id);
+      
+      if (!user) {
+        console.log(`Usuário não encontrado com ID: ${id}`);
+        return done(null, false);
+      }
+      
+      console.log(`Usuário deserializado: ${user.email} (ID: ${user.id})`);
+      
+      // Remover a senha antes de retornar
+      const { password: _password, ...userWithoutPassword } = user;
+      done(null, userWithoutPassword as any);
     } catch (err) {
+      console.error('Erro ao deserializar usuário:', err);
       done(err);
     }
   });
@@ -227,35 +232,37 @@ export function setupAuth(app: Express) {
   // Endpoint de registro
   app.post("/api/auth/register", async (req, res, next) => {
     try {
+      console.log(`Tentativa de registro: ${req.body.email}`);
+      
+      // Importar o módulo de autenticação mock
+      const { findUserByEmail, createUser } = await import('./mock-auth');
+      
       // Verificar se o usuário já existe
-      const [existingUser] = await db
-        .select()
-        .from(users)
-        .where(eq(users.email, req.body.email));
+      const existingUser = await findUserByEmail(req.body.email);
 
       if (existingUser) {
+        console.log(`Email já registrado: ${req.body.email}`);
         return res.status(400).json({ message: "Este email já está registrado" });
       }
 
       // Criar o novo usuário
-      const [newUser] = await db
-        .insert(users)
-        .values({
-          email: req.body.email,
-          name: req.body.name,
-          password: await hashPassword(req.body.password),
-          role: "user", // Por padrão, todos os novos usuários são "user"
-          active: true,
-          language: req.body.language || "pt-BR",
-          createdAt: new Date(),
-        })
-        .returning();
+      const hashedPassword = await hashPassword(req.body.password);
+      const newUser = await createUser({
+        email: req.body.email,
+        name: req.body.name,
+        password: hashedPassword,
+        role: "user", // Por padrão, todos os novos usuários são "user"
+        active: true,
+        language: req.body.language || "pt-BR",
+        createdAt: new Date(),
+      });
 
       // Autenticar o usuário após o registro
-      req.login(newUser, (err) => {
+      // Remover a senha antes de enviar para req.login
+      const { password: _password, ...userWithoutPassword } = newUser;
+      
+      req.login(userWithoutPassword as Express.User, (err) => {
         if (err) return next(err);
-        // Retirar a senha antes de enviar a resposta
-        const { password, ...userWithoutPassword } = newUser;
         return res.status(201).json(userWithoutPassword);
       });
     } catch (error) {
@@ -440,31 +447,36 @@ export function setupAuth(app: Express) {
     if (req.session?.passport?.user && !req.user) {
       console.log(`Detectada inconsistência: ID ${req.session.passport.user} na sessão mas req.user ausente`);
       
-      // Buscar o usuário pelo ID no banco de dados
-      db.select()
-        .from(users)
-        .where(eq(users.id, req.session.passport.user))
-        .then(results => {
-          if (results.length > 0) {
-            const user = results[0];
-            console.log(`Usuário recuperado manualmente do banco: ${user.id}, ${user.email}`);
+      // Importar o módulo de autenticação mock e buscar o usuário
+      import('./mock-auth').then(async ({ findUserById }) => {
+        try {
+          const userId = req.session?.passport?.user;
+          if (!userId) {
+            console.log("ID de usuário não encontrado na sessão");
+            return res.status(401).json({ message: "Não autorizado" });
+          }
+          
+          const user = await findUserById(userId);
+          
+          if (user) {
+            console.log(`Usuário recuperado manualmente do mock: ${user.id}, ${user.email}`);
             
             // Atualizar a sessão
-            const { password, ...userWithoutPassword } = user;
+            const { password: _password, ...userWithoutPassword } = user;
             if (req.session) {
               req.session.user = userWithoutPassword;
             }
             
             return res.json(userWithoutPassword);
           } else {
-            console.log("Usuário não encontrado no banco");
+            console.log("Usuário não encontrado no mock");
             return res.status(401).json({ message: "Não autorizado" });
           }
-        })
-        .catch(error => {
+        } catch (error) {
           console.error("Erro ao buscar usuário pelo ID na sessão:", error);
           return res.status(401).json({ message: "Não autorizado" });
-        });
+        }
+      });
       
       return; // importante para evitar que a resposta seja enviada duas vezes
     }

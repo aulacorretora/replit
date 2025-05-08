@@ -151,9 +151,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error('Erro ao verificar sessão:', err);
       }
       
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 1500);
+      console.log('Redirecionando para dashboard imediatamente');
+      window.location.href = '/dashboard';
       
       toast({
         title: "Login realizado com sucesso",
@@ -210,9 +209,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error('Erro ao verificar sessão após registro:', err);
       }
       
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 1500);
+      console.log('Redirecionando para dashboard imediatamente');
+      window.location.href = '/dashboard';
       
       toast({
         title: "Cadastro realizado com sucesso",

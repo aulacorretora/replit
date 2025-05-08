@@ -57,15 +57,9 @@ export function ProtectedRoute({
     localStorage.removeItem('zapban_user');
     localStorage.removeItem('userId');
     
-    setTimeout(() => {
-      window.location.href = '/auth';
-    }, 1500); // Aumentado para 1500ms para consistência com outros redirecionamentos
-    
     return (
       <Route path={path}>
-        <div className="flex items-center justify-center min-h-screen">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
+        <Redirect to="/auth" />
       </Route>
     );
   }
@@ -76,7 +70,7 @@ export function ProtectedRoute({
     useEffect(() => {
       const verifySession = async () => {
         try {
-          const res = await fetch('https://zapban.com/api/auth/user', {
+          const res = await fetch('/api/auth/user', {
             credentials: 'include',
             headers: {
               'Cache-Control': 'no-cache, no-store, must-revalidate',
