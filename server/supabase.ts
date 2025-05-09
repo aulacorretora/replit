@@ -1,25 +1,27 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Supabase configuration - URL do projeto novo
-const supabaseUrl = 'https://gqjfbdqgcjvdnbvcupcf.supabase.co';
+// Supabase configuration - Usando variáveis de ambiente
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || '';
 
-// Chave pública anon (segura para usar no frontend também)
-const supabaseKey = process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0MDAzNjksImV4cCI6MjA2MTk3NjM2OX0.x-hqQJYG2dcdmAxu6MGdWEdUFI3GjffxGBvzat2oAX4';
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('ERRO: Variáveis de ambiente SUPABASE_URL e SUPABASE_ANON_KEY devem ser configuradas');
+}
 
 // Cliente Supabase com chave anon
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Cliente Supabase com service role para operações administrativas
 // Esta chave deve ser usada apenas no backend
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE;
-if (!serviceRoleKey) {
-  console.warn('SUPABASE_SERVICE_ROLE não definida. Operações administrativas podem falhar.');
+if (!supabaseServiceKey) {
+  console.warn('SUPABASE_SERVICE_KEY não definida. Operações administrativas podem falhar.');
 }
 
 // Criamos o supabaseAdmin apenas se tivermos a service role key
-export const supabaseAdmin = serviceRoleKey 
-  ? createClient(supabaseUrl, serviceRoleKey)
-  : createClient(supabaseUrl, supabaseKey); // Fallback para chave anon
+export const supabaseAdmin = supabaseServiceKey 
+  ? createClient(supabaseUrl, supabaseServiceKey)
+  : createClient(supabaseUrl, supabaseAnonKey); // Fallback para chave anon
 
 // Helper to check if the supabase client is working
 export async function checkSupabaseConnection() {
