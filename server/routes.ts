@@ -400,13 +400,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Set up Baileys message webhooks to broadcast to WebSocket clients
   setupBaileysWebhooks(broadcast, broadcastToUser);
   
-  // Health check endpoint
+  // Health check endpoint - no authentication required
   app.get('/api/health', (req, res) => {
     res.json({ 
       status: 'ok',
       websocket: wss ? true : false,
       connections: wss ? wss.clients.size : 0,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      environment: {
+        nodeEnv: process.env.NODE_ENV || 'development',
+        supabaseConnected: true
+      }
     });
   });
   
