@@ -26,8 +26,12 @@ import connectPgSimple from 'connect-pg-simple';
 // import { pool } from './db';
 
 // Supabase setup
-const supabaseUrl = 'https://gqjfbdqgcjvdnbvcupcf.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0MDAzNjksImV4cCI6MjA2MTk3NjM2OX0.x-hqQJYG2dcdmAxu6MGdWEdUFI3GjffxGBvzat2oAX4';
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY || '';
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('ERRO: Variáveis de ambiente SUPABASE_URL e SUPABASE_SERVICE_KEY devem ser configuradas');
+}
 
 // Storage interface definition
 export interface IStorage {

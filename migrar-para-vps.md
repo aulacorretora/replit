@@ -17,11 +17,12 @@ Este documento contém as etapas para migrar o projeto ZapBan da ambiente de des
 
 **Supabase**
 - Projeto: Devin ZapBan
-- URL: https://gqjfbdqgcjvdnbvcupcf.supabase.co
+- URL: [SUPABASE_URL]
 - Usuário: seguewell@gmail.com
 - Senha: [REDACTED]
-- Anon Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0MDAzNjksImV4cCI6MjA2MTk3NjM2OX0.x-hqQJYG2dcdmAxu6MGdWEdUFI3GjffxGBvzat2oAX4
-- Service Role Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQwMDM2OSwiZXhwIjoyMDYxOTc2MzY5fQ.wI3QXmtlkUlNjBHsd-HPlbQfQF0fX0sysoNoOYviqHo
+- Anon Key: [SUPABASE_ANON_KEY]
+- Service Role Key: [SUPABASE_SERVICE_KEY]
+- Obs: As chaves reais devem ser obtidas do painel do Supabase e nunca armazenadas em arquivos de código
 
 **Domínio**
 - zapban.com
@@ -90,13 +91,13 @@ npm install
 Configurar o arquivo de variáveis de ambiente para conectar ao Supabase:
 
 ```bash
-# Criar arquivo .env
+# Criar arquivo .env (substitua os valores entre colchetes pelas credenciais reais)
 cat > /var/www/zapban/.env << EOL
-DATABASE_URL=postgres://postgres.gqjfbdqgcjvdnbvcupcf:password@aws-0-us-east-1.pooler.supabase.com:5432/postgres
-SUPABASE_URL=https://gqjfbdqgcjvdnbvcupcf.supabase.co
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0MDAzNjksImV4cCI6MjA2MTk3NjM2OX0.x-hqQJYG2dcdmAxu6MGdWEdUFI3GjffxGBvzat2oAX4
-SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQwMDM2OSwiZXhwIjoyMDYxOTc2MzY5fQ.wI3QXmtlkUlNjBHsd-HPlbQfQF0fX0sysoNoOYviqHo
-SESSION_SECRET=zapban_session_secret_key_change_me_in_production
+DATABASE_URL=postgres://postgres.[PROJECT_ID]:[PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+SUPABASE_URL=[SUPABASE_URL]
+SUPABASE_ANON_KEY=[SUPABASE_ANON_KEY]
+SUPABASE_SERVICE_KEY=[SUPABASE_SERVICE_KEY]
+SESSION_SECRET=$(openssl rand -hex 32)
 EOL
 
 # Ajustar permissões
