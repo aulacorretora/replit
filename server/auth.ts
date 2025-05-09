@@ -659,6 +659,8 @@ export function setupAuth(app: Express) {
       "/api/auth/logout",
       "/api/auth/forgot-password",
       "/api/auth/reset-password",
+      "/api/health",
+      "/api/ws-status",
     ];
     
     if (publicPaths.includes(req.path) || req.isAuthenticated()) {
