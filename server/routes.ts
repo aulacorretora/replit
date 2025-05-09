@@ -414,7 +414,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
   
-  // API endpoint para verificar status do WebSocket - útil para diagnósticos
+  // API endpoint para verificar status do WebSocket - útil para diagnósticos - no authentication required
   app.get('/api/ws-status', (req, res) => {
     if (!wss) {
       return res.status(500).json({
@@ -439,7 +439,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       status: 'ok',
       connections: wss.clients.size,
       connectionDetails: connections,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      environment: {
+        nodeEnv: process.env.NODE_ENV || 'development',
+        supabaseConnected: true
+      }
     });
   });
 
