@@ -1,3 +1,5 @@
+import './env.js';
+
 import express, { type Request, Response, NextFunction } from "express";
 import multer from "multer";
 import fs from "fs";
