@@ -44,8 +44,27 @@ const qrCodes = new Map();
 // Map to store connection states
 const connectionStates = new Map();
 
-// Store path for session data
-const SESSION_PATH = path.join(process.cwd(), 'whatsapp-sessions');
+function enhancedLog(level: string, message: string, context?: any) {
+  const timestamp = new Date().toISOString();
+  const formattedMessage = `[${timestamp}] [${level}] ${message}`;
+  
+  console[level === 'error' ? 'error' : 'log'](formattedMessage);
+  
+  if (process.env.NODE_ENV === 'production') {
+    const logDir = path.resolve('/var/www/zapban/logs');
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir, { recursive: true });
+    }
+    
+    const logFile = path.join(logDir, `baileys-${level}.log`);
+    fs.appendFileSync(logFile, formattedMessage + (context ? ` ${JSON.stringify(context)}` : '') + '\n');
+  }
+}
+
+// Store path for session data - Caminho absoluto em produção
+const SESSION_PATH = process.env.NODE_ENV === 'production' 
+  ? path.resolve('/var/www/zapban/whatsapp-sessions')
+  : path.join(process.cwd(), 'whatsapp-sessions');
 
 // Create sessions directory if it doesn't exist
 if (!fs.existsSync(SESSION_PATH)) {
@@ -116,7 +135,12 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
       emitOwnEvents: true, // Enable to receive all events
       retryRequestDelayMs: 1000,
       markOnlineOnConnect: true, // Ensure device shows as online
-      patchMessageBeforeSending: true // Ensure message format is correct
+      patchMessageBeforeSending: true, // Ensure message format is correct
+      keepAliveIntervalMs: 25000, // Manter conexão ativa
+      transactionOpts: { // Configurações de transação
+        maxCommits: 10,
+        delayMs: 500
+      }
     });
     
     // Connect store to socket
@@ -132,7 +156,7 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
     sock.ev.on('connection.update', async (update) => {
       const { connection, lastDisconnect, qr, receivedPendingNotifications } = update;
       
-      console.log(`Connection update for instance ${instanceId}:`, { 
+      enhancedLog('info', `Connection update for instance ${instanceId}`, { 
         connection, 
         qrAvailable: !!qr, 
         disconnectReason: lastDisconnect ? JSON.stringify(lastDisconnect.error || 'Unknown') : 'None',
