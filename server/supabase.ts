@@ -1,12 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
+import { ENV } from './env';
 
-// Supabase configuration - Usando variáveis de ambiente
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || '';
+// Supabase configuration - Usando variáveis de ambiente do módulo env.ts
+const supabaseUrl = ENV.SUPABASE_URL || '';
+const supabaseAnonKey = ENV.SUPABASE_ANON_KEY || '';
+const supabaseServiceKey = ENV.SUPABASE_SERVICE_KEY || '';
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('ERRO: Variáveis de ambiente SUPABASE_URL e SUPABASE_ANON_KEY devem ser configuradas');
+  console.error('Valores atuais:', { 
+    supabaseUrl: supabaseUrl ? 'configurado' : 'não configurado', 
+    supabaseAnonKey: supabaseAnonKey ? 'configurado' : 'não configurado' 
+  });
 }
 
 // Cliente Supabase com chave anon

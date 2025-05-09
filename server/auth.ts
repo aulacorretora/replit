@@ -659,12 +659,20 @@ export function setupAuth(app: Express) {
       "/api/auth/logout",
       "/api/auth/forgot-password",
       "/api/auth/reset-password",
+      "/api/health",
+      "/api/ws-status",
     ];
     
-    if (publicPaths.includes(req.path) || req.isAuthenticated()) {
+    // Verificar se o caminho atual é público
+    const isPublicPath = publicPaths.some(path => 
+      req.path === path || req.path.startsWith(path + '?')
+    );
+    
+    if (isPublicPath || req.isAuthenticated()) {
       return next();
     }
     
+    console.log(`Acesso não autorizado a: ${req.path} (Método: ${req.method})`);
     res.status(401).json({ message: "Não autorizado" });
   });
 
