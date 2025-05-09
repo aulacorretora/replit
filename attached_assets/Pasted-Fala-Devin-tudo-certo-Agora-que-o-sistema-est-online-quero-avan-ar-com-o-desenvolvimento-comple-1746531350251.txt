@@ -1,0 +1,87 @@
+Fala Devin, tudo certo?
+
+Agora que o sistema está online, quero avançar com o desenvolvimento completo da próxima etapa. A ideia é transformar o ZapBan em uma plataforma única de atendimento e automação com inteligência artificial.
+
+Segue abaixo o que preciso que você adicione:
+
+🧠 1. Menu: Agente Humanizado (IA)
+Adicionar um novo menu chamado “Agente Humanizado”, onde será possível:
+
+Criar um ou mais agentes de atendimento baseados em IA
+
+Cada agente pode:
+
+Ler e interpretar:
+
+Texto
+
+Áudio (voz)
+
+PDFs
+
+Imagens (com OCR)
+
+Vídeos curtos (se possível)
+
+Responder via:
+
+Texto
+
+Áudio (voz sintetizada realista)
+
+Possibilidade de configurar:
+
+Tom de voz (ex: informal, empático, vendedor, técnico, etc.)
+
+Objetivo do agente (suporte, vendas, onboarding, etc.)
+
+Pode ser baseado em API da OpenAI ou outra solução que prefira
+
+🔁 2. Menu: Automações (Canvas / Flow Builder)
+Adicionar um novo menu chamado “Automações” com sistema visual em fluxo estilo cards conectáveis (arrastar e soltar), como ferramentas do tipo Manychat ou BotConversa.
+
+Cada automação pode ser conectada a uma instância do WhatsApp e deve permitir criar sequências de mensagens e lógica. Funcionalidades:
+
+🔧 Blocos disponíveis (cards):
+Texto
+
+Áudio
+
+Vídeo
+
+PDF
+
+Imagem
+
+Digitando... (ex: por 2 segundos, para humanizar)
+
+If/Else (condicional por resposta, horário, tag etc.)
+
+Tags (marcar usuários automaticamente)
+
+Chamadas de API externas (para integrações com Supabase, webhook, Zapier, etc.)
+
+Integração com Agente Humanizado criado no outro menu
+
+Integração com OpenAI (para geração de texto, análise de sentimento, etc.)
+
+🧩 Extras que podemos adicionar para diferenciar:
+Bloco “Aguardar Resposta” com timeout (e redirecionamento)
+
+Bloco “Agendar Mensagem”
+
+Bloco “Menu com Botões” (respostas rápidas)
+
+Bloco “Entrada de Dados” (nome, e-mail, telefone etc.)
+
+Bloco “Enviar para Humano” (redireciona para painel de atendimento manual se disponível)
+
+🎯 Objetivo Final
+A ideia é que o usuário do ZapBan possa:
+
+Criar automações simples ou avançadas com cards visuais
+
+Usar o agente humanizado dentro do fluxo como parte da conversa
+
+Atender seus leads sem depender de ninguém e com inteligência
+

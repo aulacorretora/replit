@@ -1,0 +1,81 @@
+👨‍💻 Projeto: DEVIN ZAPBAN
+🔗 Supabase URL: https://gqjfbdqgcjvdnbvcupcf.supabase.co
+🔑 Chave Pública (anon):
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0MDAzNjksImV4cCI6MjA2MTk3NjM2OX0.x-hqQJYG2dcdmAxu6MGdWEdUFI3GjffxGBvzat2oAX4
+🔒 Service Role (caso precise executar operações seguras no backend):
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQwMDM2OSwiZXhwIjoyMDYxOTc2MzY5fQ.wI3QXmtlkUlNjBHsd-HPlbQfQF0fX0sysoNoOYviqHo
+
+🧱 Tabelas já criadas:
+users
+Campos:
+
+id (int)
+
+email (text)
+
+password (text, bcrypt)
+
+name (text)
+
+role (text)
+
+active (bool)
+
+language (text)
+
+created_at (timestamp)
+
+last_login_at (timestamp)
+
+instances
+
+messages
+
+contacts
+
+groups
+
+groups_contacts
+
+automations
+
+automation_nodes
+
+automation_edges
+
+automation_executions
+
+automation_execution_logs
+
+ai_agents
+
+ai_agent_messages
+
+ai_agent_documents
+
+ai_agent_conversations
+
+chats
+
+chat_tags
+
+contact_tags
+
+🔒 Segurança (RLS):
+Atenção: A RLS (Row Level Security) está desativada por enquanto, então pode usar anon key diretamente para testes e desenvolvimento.
+
+Quando for para produção, recomendamos ativar a RLS e configurar policies por usuário.
+
+💾 Sugestão de .env para o projeto: VITE_SUPABASE_URL=https://gqjfbdqgcjvdnbvcupcf.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0MDAzNjksImV4cCI6MjA2MTk3NjM2OX0.x-hqQJYG2dcdmAxu6MGdWEdUFI3GjffxGBvzat2oAX4
+
+
+✅ Objetivo do dev:
+Conectar o frontend com o Supabase.
+
+Garantir que o login funcione usando a tabela users.
+
+Permitir criar, editar e deletar dados nas tabelas instances, messages e outras necessárias.
+
+Exibir corretamente os dados do usuário logado (com base no email e token, se usar Supabase Auth ou auth manual com JWT depois).
+

@@ -1,0 +1,102 @@
+🛠️ AJUSTES FINAIS PARA O ZAPBAN FUNCIONAL EM PRODUÇÃO
+
+Olá Devin! Agora que avançamos bem, preciso garantir que a plataforma esteja 100% funcional e pronta para o cliente final consumir. Seguem os ajustes necessários com clareza e prioridade:
+
+✅ 1. Finalizar e Ativar Todos os Fluxos Reais da Plataforma
+⚙️ Automação
+
+Ativar o menu de Automações com criação real de fluxos (nada placeholder).
+
+Implementar um editor canvas visual (tipo Node-RED, ReactFlow ou Drawflow) com blocos conectáveis.
+
+Os blocos devem incluir:
+
+Texto
+
+Áudio
+
+Vídeo
+
+PDF
+
+Imagem
+
+IF (condições)
+
+TAGs
+
+Digitando... (com tempo customizável)
+
+Integração OpenAI (para gerar resposta automática com IA)
+
+Enviar arquivos
+
+Webhook
+
+Delay
+
+Dentro dos blocos, permitir puxar os agentes humanizados criados.
+
+✅ 2. Menu Agente Humanizado (IA Ativa)
+Criar um menu chamado "Agente Humanizado".
+
+Nesse menu, o usuário pode:
+
+Criar um agente com nome e personalidade.
+
+Escolher se o agente responde por texto ou áudio.
+
+Habilitar leitura e resposta de:
+
+Texto
+
+Áudio (voz)
+
+PDF
+
+Imagens
+
+Vídeos
+
+Esses agentes devem estar integrados ao OpenAI com contexto e tom de fala personalizados.
+
+✅ 3. Integração Real entre os Módulos
+As automações precisam chamar os agentes de IA criados.
+
+Os fluxos precisam funcionar mesmo com WhatsApp ativo.
+
+Nenhuma funcionalidade deve estar como "em desenvolvimento" no sistema final. Tudo funcional.
+
+✅ 4. Ambiente Seguro para Atualizações Futuras
+Estruturar o projeto com:
+
+Ambiente de staging (dev) e ambiente de produção
+
+Deploy automatizado com Git (sem precisar deletar o que já está no ar)
+
+Scripts seguros para aplicar novos módulos ou funcionalidades sem afetar o funcionamento atual.
+
+Sugestão: Docker ou Vite com ambientes separados, ou uso de feature flags.
+
+✅ 5. Correções de Roteamento
+A aba "sidebar.analytics" está com erro 404. Corrigir e estruturar essa rota.
+
+Garantir que todo novo menu adicionado esteja mapeado corretamente no roteador da aplicação.
+
+✅ 6. Entrega do Projeto Redondo
+Tudo funcional e testado no ambiente replit.dev antes de subir na VPS.
+
+Só migrar quando:
+
+Agente de IA estiver funcionando
+
+Fluxo de automação funcional
+
+Todas rotas acessíveis
+
+Interface final ajustada (cores, identidade visual, etc.)
+
+Resumo final
+Queremos deixar o projeto pronto para uso comercial, com interface moderna, IA ativa e fluxos prontos para o cliente criar atendimentos e automações reais. O foco agora é não subir placeholder nem recurso pela metade.
+
+Assim que tudo estiver funcionando perfeitamente no ambiente dev (Replit), validamos e subimos para produção.

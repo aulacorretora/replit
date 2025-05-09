@@ -1,0 +1,47 @@
+🚧 Ajustes Prioritários e Finalização Funcional – Projeto ZapBan 🚧
+
+Fala Devin! Tudo certo?
+
+Primeiramente, parabéns pelo avanço, o projeto está ficando incrível visualmente, mas agora precisamos finalizar funcionalmente as partes críticas, garantindo que tudo esteja 100% pronto para uso real por clientes finais.
+
+✅ O que precisa funcionar 100%:
+1. Assistentes de IA (menu "sidebar.aiAgents")
+Criar, editar, excluir e ativar/desativar assistentes.
+
+Os assistentes devem funcionar de forma real: salvar dados corretamente, permitir configurações de personalidade e contexto.
+
+A opção “Conversar” precisa estar 100% funcional (responder texto, ler arquivos PDF, áudio, imagem, vídeo etc).
+
+Esses assistentes precisam ser utilizáveis nos fluxos (veja item 2).
+
+2. Automações (menu "sidebar.automations")
+O editor visual está lindo! Mas alguns blocos não estão sendo inseridos corretamente e alguns clicáveis dentro do fluxo não estão abrindo suas propriedades ou estão travando.
+
+Precisamos:
+
+Corrigir todos os nós/blocos (mensagem, digitando, áudio, imagem, documento, condição, etc).
+
+Permitir puxar o agente de IA criado no outro menu.
+
+Permitir salvar o fluxo completo com todas as conexões.
+
+Validação completa: ao salvar, o sistema deve verificar se tudo está correto, com feedback visual caso algo esteja faltando.
+
+3. API Keys
+As chaves estão sendo inseridas, mas não estão sendo persistidas/salvas corretamente.
+
+Precisamos que a integração com a OpenAI funcione com base nessas chaves salvas.
+
+📌 Requisitos Técnicos
+Todos os dados devem estar sendo salvos corretamente no Supabase (já temos as tabelas, pode adicionar/modificar conforme necessário).
+
+Nenhuma função nova pode quebrar o que já está funcionando no ambiente atual (WhatsApp, instâncias, login, dashboard).
+
+Se possível, implementar com hot reload ou deploy por partes para não tirar o sistema do ar durante as atualizações.
+
+⚠️ Importante
+O projeto está indo para a fase de liberação para usuários reais. Por isso, essas funcionalidades precisam ser entregues totalmente funcionais e testadas para garantir estabilidade e confiabilidade.
+
+Assim que tudo acima estiver redondo, faremos a rodada de testes finais e vamos publicar oficialmente a plataforma com plano de acesso real.
+
+Obrigado pelo suporte até aqui. 🙏

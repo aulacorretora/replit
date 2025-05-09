@@ -1,0 +1,139 @@
+📌 PRONT — Menu de Grupos com Automação e IA | ZapBan
+🎯 Objetivo do menu "Grupos"
+Criar um ambiente completo onde o usuário pode:
+
+Criar e gerenciar grupos de WhatsApp automaticamente.
+
+Programar postagens com IA ou manualmente.
+
+Monitorar engajamento e performance dos grupos.
+
+Ter controle total sobre criação, edição, movimentação e automação nos grupos.
+
+🧱 Estrutura do Menu
+1. Conexão com Instância (WhatsApp)
+Dropdown para selecionar a instância ativa (já conectada via QR Code).
+
+Botão: "Atualizar grupos dessa instância".
+
+2. Criação de Grupo Automatizada
+Campos:
+
+Nome do grupo
+
+Foto do grupo (upload)
+
+Descrição
+
+Participantes (campo de múltiplos números com formatação automática)
+
+Botão: "Criar grupo automaticamente"
+
+✅ Se possível, um agente IA pode sugerir nome, descrição e imagem automaticamente.
+
+🧠 Inteligência Artificial (Agente)
+Opção "Ativar Agente IA" em qualquer ação:
+
+Gera copy para postagens automaticamente com base no tema do grupo.
+
+Sugere conteúdo com base no histórico do grupo.
+
+Identifica horário ideal de postagem.
+
+Monitora perguntas frequentes e sugere respostas automáticas (chat IA nos grupos).
+
+🔁 Fluxo de Postagens para Grupos
+Interface estilo canvas/arrasta-e-solta com:
+
+Elementos de mensagem de texto, imagem, áudio, documento, enquete (se possível).
+
+Bloco de ação: "Marcar lead no privado"
+
+Bloco de condição: "Se membro clicou", "Se viu mensagem"
+
+Data/hora programada para envio.
+
+Histórico de envios (com status: enviado, pendente, falhou).
+
+📊 Monitoramento em Tempo Real
+Mostrar:
+
+Total de membros por grupo
+
+Pessoas online no momento (se possível via API de presença)
+
+Cliques em links (com redirecionador tracking)
+
+Visualizações (baseadas em resposta ou confirmação)
+
+Histórico de mensagens enviadas
+
+Próximas programações com contagem regressiva
+
+🛠️ Ações Gerais para Cada Grupo
+Editar grupo (nome, imagem, participantes, descrição)
+
+Deletar grupo
+
+Duplicar grupo
+
+Exportar membros
+
+Criar novo grupo automaticamente ao atingir X membros (ex: 256)
+
+🔄 Fluxo de Criação Automática de Grupos
+Definir regra:
+Exemplo: Ao atingir 256 membros → criar novo grupo com nome sequencial (Grupo A, Grupo B...)
+
+Transferir membros automaticamente se possível
+
+Atualizar painel com novos grupos criados
+
+🧰 Recursos extras
+Botão “Usar Agente IA” disponível em todos blocos:
+
+Postagens
+
+Criação de grupo
+
+Geração de conteúdo
+
+Configuração automática
+
+Todos os blocos com opção de:
+
+Editar
+
+Duplicar
+
+Deletar
+
+Salvar como template
+
+💾 Banco de Dados - Tabelas sugeridas
+groups
+
+group_messages
+
+group_settings
+
+group_members
+
+group_schedules
+
+group_statistics
+
+group_templates
+
+ai_copies
+
+🧪 Futuras funções premium:
+A/B Teste de mensagens
+
+Auto-análise de engajamento via IA
+
+Integração com pixel de conversão
+
+Módulo de funil por grupo
+
+Importação de leads por lista
