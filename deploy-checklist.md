@@ -17,8 +17,9 @@ Este documento confirma a sequência de passos para migrar o sistema ZapBan do a
 - Senha: [SENHA FORNECIDA]
 
 **Supabase**
-- URL: https://mopdlsgtfddzqjjerecz.supabase.co
-- API Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... [CHAVE FORNECIDA]
+- URL: https://gqjfbdqgcjvdnbvcupcf.supabase.co
+- API Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0MDAzNjksImV4cCI6MjA2MTk3NjM2OX0.x-hqQJYG2dcdmAxu6MGdWEdUFI3GjffxGBvzat2oAX4
+- Service Role Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQwMDM2OSwiZXhwIjoyMDYxOTc2MzY5fQ.wI3QXmtlkUlNjBHsd-HPlbQfQF0fX0sysoNoOYviqHo
 
 **Domínio**
 - zapban.com (já configurado com DNS apontando para o IP)
@@ -87,9 +88,10 @@ ls -la
 ```bash
 # Criar arquivo .env
 cat > /var/www/zapban/.env << EOL
-DATABASE_URL=postgres://postgres.[ID_PROJETO]:password@db.[ID_PROJETO].supabase.co:5432/postgres
-SUPABASE_URL=https://mopdlsgtfddzqjjerecz.supabase.co
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+DATABASE_URL=postgres://postgres.gqjfbdqgcjvdnbvcupcf:password@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+SUPABASE_URL=https://gqjfbdqgcjvdnbvcupcf.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0MDAzNjksImV4cCI6MjA2MTk3NjM2OX0.x-hqQJYG2dcdmAxu6MGdWEdUFI3GjffxGBvzat2oAX4
+SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQwMDM2OSwiZXhwIjoyMDYxOTc2MzY5fQ.wI3QXmtlkUlNjBHsd-HPlbQfQF0fX0sysoNoOYviqHo
 SESSION_SECRET=zapban_session_secret_key_change_in_production
 NODE_ENV=production
 EOL

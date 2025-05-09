@@ -7,7 +7,7 @@ import { eq } from 'drizzle-orm';
 import { HTTP_STATUS, ERROR_TYPES } from '../lib/constants';
 
 // Cria client do Supabase
-const supabaseUrl = process.env.SUPABASE_URL || 'https://mopdlsgtfddzqjjerecz.supabase.co';
+const supabaseUrl = process.env.SUPABASE_URL || 'https://gqjfbdqgcjvdnbvcupcf.supabase.co';
 const supabaseKey = process.env.SUPABASE_KEY;
 
 // Verificação ampla para permitir o sistema funcionar mesmo sem Supabase configurado

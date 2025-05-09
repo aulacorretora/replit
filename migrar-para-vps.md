@@ -16,11 +16,12 @@ Este documento contém as etapas para migrar o projeto ZapBan da ambiente de des
 - Senha: [REDACTED]
 
 **Supabase**
-- Projeto: ZapBan
-- URL: https://mopdlsgtfddzqjjerecz.supabase.co
+- Projeto: Devin ZapBan
+- URL: https://gqjfbdqgcjvdnbvcupcf.supabase.co
 - Usuário: seguewell@gmail.com
 - Senha: [REDACTED]
-- Anon Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vcGRsc2d0ZmRkenFqamVyZWN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1NjEwMDMsImV4cCI6MjA1ODEzNzAwM30.V8siUExiTOwKTqpIUEfgjJeDAeetORbf3pG8Nn4OgyA
+- Anon Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0MDAzNjksImV4cCI6MjA2MTk3NjM2OX0.x-hqQJYG2dcdmAxu6MGdWEdUFI3GjffxGBvzat2oAX4
+- Service Role Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQwMDM2OSwiZXhwIjoyMDYxOTc2MzY5fQ.wI3QXmtlkUlNjBHsd-HPlbQfQF0fX0sysoNoOYviqHo
 
 **Domínio**
 - zapban.com
@@ -91,9 +92,10 @@ Configurar o arquivo de variáveis de ambiente para conectar ao Supabase:
 ```bash
 # Criar arquivo .env
 cat > /var/www/zapban/.env << EOL
-DATABASE_URL=postgres://postgres.[ID_DO_PROJETO]:password@db.[ID_DO_PROJETO].supabase.co:5432/postgres
-SUPABASE_URL=https://mopdlsgtfddzqjjerecz.supabase.co
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vcGRsc2d0ZmRkenFqamVyZWN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1NjEwMDMsImV4cCI6MjA1ODEzNzAwM30.V8siUExiTOwKTqpIUEfgjJeDAeetORbf3pG8Nn4OgyA
+DATABASE_URL=postgres://postgres.gqjfbdqgcjvdnbvcupcf:password@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+SUPABASE_URL=https://gqjfbdqgcjvdnbvcupcf.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0MDAzNjksImV4cCI6MjA2MTk3NjM2OX0.x-hqQJYG2dcdmAxu6MGdWEdUFI3GjffxGBvzat2oAX4
+SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQwMDM2OSwiZXhwIjoyMDYxOTc2MzY5fQ.wI3QXmtlkUlNjBHsd-HPlbQfQF0fX0sysoNoOYviqHo
 SESSION_SECRET=zapban_session_secret_key_change_me_in_production
 EOL
 
