@@ -116,7 +116,55 @@ export const broadcast = global.broadcast;
 export const broadcastToUser = global.broadcastToUser;
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Configurar autenticação antes de qualquer outra rota
+  // Registrar rotas de diagnóstico ANTES da autenticação
+  // Health check endpoint - no authentication required
+  app.get('/api/health', (req, res) => {
+    res.json({ 
+      status: 'ok',
+      websocket: wss ? true : false,
+      connections: wss ? wss.clients.size : 0,
+      timestamp: new Date().toISOString(),
+      environment: {
+        nodeEnv: process.env.NODE_ENV || 'development',
+        supabaseConnected: true
+      }
+    });
+  });
+  
+  // API endpoint para verificar status do WebSocket - útil para diagnósticos - no authentication required
+  app.get('/api/ws-status', (req, res) => {
+    if (!wss) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'WebSocket server not initialized',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // Coletar informações sobre as conexões
+    const connections: any[] = [];
+    wss.clients?.forEach((client: any) => {
+      connections.push({
+        userId: client.userId || null,
+        sessionId: client.sessionId ? true : false,
+        readyState: client.readyState,
+        isAlive: client.isAlive
+      });
+    });
+    
+    res.json({
+      status: 'ok',
+      connections: wss?.clients?.size || 0,
+      connectionDetails: connections,
+      timestamp: new Date().toISOString(),
+      environment: {
+        nodeEnv: process.env.NODE_ENV || 'development',
+        supabaseConnected: true
+      }
+    });
+  });
+  
+  // Configurar autenticação DEPOIS das rotas de diagnóstico
   setupAuth(app);
   
   // Registrar rotas para API
