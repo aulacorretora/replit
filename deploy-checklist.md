@@ -17,8 +17,11 @@ Este documento confirma a sequência de passos para migrar o sistema ZapBan do a
 - Senha: [SENHA FORNECIDA]
 
 **Supabase**
-- URL: https://mopdlsgtfddzqjjerecz.supabase.co
-- API Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... [CHAVE FORNECIDA]
+- Projeto: Devin ZapBan
+- URL: [SUPABASE_URL]
+- API Key: [SUPABASE_ANON_KEY]
+- Service Role Key: [SUPABASE_SERVICE_KEY]
+- Obs: As chaves reais devem ser obtidas do painel do Supabase e nunca armazenadas em arquivos de código
 
 **Domínio**
 - zapban.com (já configurado com DNS apontando para o IP)
@@ -85,12 +88,13 @@ ls -la
 ### 4. 🔐 Configuração de Variáveis de Ambiente
 
 ```bash
-# Criar arquivo .env
+# Criar arquivo .env (substitua os valores entre colchetes pelas credenciais reais)
 cat > /var/www/zapban/.env << EOL
-DATABASE_URL=postgres://postgres.[ID_PROJETO]:password@db.[ID_PROJETO].supabase.co:5432/postgres
-SUPABASE_URL=https://mopdlsgtfddzqjjerecz.supabase.co
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-SESSION_SECRET=zapban_session_secret_key_change_in_production
+DATABASE_URL=postgres://postgres.[PROJECT_ID]:[PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+SUPABASE_URL=[SUPABASE_URL]
+SUPABASE_ANON_KEY=[SUPABASE_ANON_KEY]
+SUPABASE_SERVICE_KEY=[SUPABASE_SERVICE_KEY]
+SESSION_SECRET=$(openssl rand -hex 32)
 NODE_ENV=production
 EOL
 

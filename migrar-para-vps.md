@@ -16,11 +16,13 @@ Este documento contém as etapas para migrar o projeto ZapBan da ambiente de des
 - Senha: [REDACTED]
 
 **Supabase**
-- Projeto: ZapBan
-- URL: https://mopdlsgtfddzqjjerecz.supabase.co
+- Projeto: Devin ZapBan
+- URL: [SUPABASE_URL]
 - Usuário: seguewell@gmail.com
 - Senha: [REDACTED]
-- Anon Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vcGRsc2d0ZmRkenFqamVyZWN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1NjEwMDMsImV4cCI6MjA1ODEzNzAwM30.V8siUExiTOwKTqpIUEfgjJeDAeetORbf3pG8Nn4OgyA
+- Anon Key: [SUPABASE_ANON_KEY]
+- Service Role Key: [SUPABASE_SERVICE_KEY]
+- Obs: As chaves reais devem ser obtidas do painel do Supabase e nunca armazenadas em arquivos de código
 
 **Domínio**
 - zapban.com
@@ -89,12 +91,13 @@ npm install
 Configurar o arquivo de variáveis de ambiente para conectar ao Supabase:
 
 ```bash
-# Criar arquivo .env
+# Criar arquivo .env (substitua os valores entre colchetes pelas credenciais reais)
 cat > /var/www/zapban/.env << EOL
-DATABASE_URL=postgres://postgres.[ID_DO_PROJETO]:password@db.[ID_DO_PROJETO].supabase.co:5432/postgres
-SUPABASE_URL=https://mopdlsgtfddzqjjerecz.supabase.co
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vcGRsc2d0ZmRkenFqamVyZWN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1NjEwMDMsImV4cCI6MjA1ODEzNzAwM30.V8siUExiTOwKTqpIUEfgjJeDAeetORbf3pG8Nn4OgyA
-SESSION_SECRET=zapban_session_secret_key_change_me_in_production
+DATABASE_URL=postgres://postgres.[PROJECT_ID]:[PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+SUPABASE_URL=[SUPABASE_URL]
+SUPABASE_ANON_KEY=[SUPABASE_ANON_KEY]
+SUPABASE_SERVICE_KEY=[SUPABASE_SERVICE_KEY]
+SESSION_SECRET=$(openssl rand -hex 32)
 EOL
 
 # Ajustar permissões
