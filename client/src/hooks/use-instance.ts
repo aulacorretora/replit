@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
@@ -120,7 +120,6 @@ export const useInstances = () => {
         .from('instances')
         .insert([
           {
-            user_id: 1, // Hardcoded integer for compatibility
             users_uuid: user.id, // Use UUID from Supabase Auth
             name: name || 'Nova Instância',
             status: 'awaiting_qr', // Set status to awaiting_qr immediately
@@ -257,12 +256,14 @@ export const useInstance = (id?: number) => {
     queryFn: () => getQrCode(id!),
     enabled: enabled && !!instance && (instance.status === 'awaiting_qr' || instance.status === 'qr_ready'),
     refetchInterval: (instance?.status === 'awaiting_qr' || instance?.status === 'qr_ready') ? 10000 : false, // Refetch every 10 seconds if QR is ready
-    onSuccess: (data) => {
-      if (data && data.qrCode) {
-        setQrCode(data.qrCode);
-      }
-    }
   });
+  
+  // Set QR code when data changes
+  React.useEffect(() => {
+    if (qrCodeData && qrCodeData.qrCode) {
+      setQrCode(qrCodeData.qrCode);
+    }
+  }, [qrCodeData]);
 
   // Um handler genérico para gerar QR Code
   const generateQRCode = useCallback(async () => {
@@ -278,11 +279,11 @@ export const useInstance = (id?: number) => {
         return data.qrCode;
       }
       return null;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error generating QR code:', error);
       toast({
         title: t('qrcode.generateError'),
-        description: error.toString(),
+        description: error instanceof Error ? error.message : String(error),
         variant: 'destructive',
       });
       return null;
