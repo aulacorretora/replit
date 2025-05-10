@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { API_ENDPOINTS } from "@/lib/constants";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { User } from "@shared/schema";
+import supabase from "@/lib/supabase";
 
 // Esquemas de validação
 export const loginSchema = z.object({
@@ -118,12 +119,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mutation para login
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      const res = await apiRequest('POST', API_ENDPOINTS.LOGIN, credentials);
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Erro ao fazer login');
+      console.log("Enviando requisição de login para Supabase");
+      
+      const supabaseUrl = 'https://gqjfbdqgcjvdnbvcupcf.supabase.co';
+      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0MDAzNjksImV4cCI6MjA2MTk3NjM2OX0.x-hqQJYG2dcdmAxu6MGdWEdUFI3GjffxGBvzat2oAX4';
+      
+      const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseKey
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Resposta de erro do Supabase:", errorData);
+        throw new Error(errorData.message || errorData.error_description || "Erro ao fazer login");
       }
-      return await res.json();
+      
+      const responseData = await response.json();
+      console.log("Resposta do Supabase de login:", { ...responseData, access_token: '[REMOVIDO]' });
+      
+      localStorage.setItem('token', responseData.access_token);
+      localStorage.setItem('refresh_token', responseData.refresh_token);
+      localStorage.setItem('user_id', responseData.user.id);
+      
+      return {
+        id: responseData.user.id,
+        email: responseData.user.email,
+        name: responseData.user.user_metadata?.name || '',
+        role: responseData.user.user_metadata?.role || 'user',
+        active: true,
+        language: responseData.user.user_metadata?.language || 'pt-BR',
+        createdAt: new Date(responseData.user.created_at),
+        lastLoginAt: new Date(),
+      };
     },
     onSuccess: (userData: User) => {
       queryClient.setQueryData([API_ENDPOINTS.USER], userData);
@@ -182,11 +217,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Mutation para logout
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest('POST', API_ENDPOINTS.LOGOUT);
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Erro ao fazer logout');
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error("Erro ao fazer logout:", error);
+        throw new Error(error.message || 'Erro ao fazer logout');
       }
+      
+      // Limpar tokens do localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user_id');
     },
     onSuccess: () => {
       queryClient.setQueryData([API_ENDPOINTS.USER], null);

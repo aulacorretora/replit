@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { API_ENDPOINTS } from '@/lib/constants';
 import { z } from 'zod';
+import supabase from '@/lib/supabase';
 
 type AuthUser = User | null;
 
@@ -76,19 +77,47 @@ export const useAuth = (): UseAuthReturn => {
   const loginMutation = useMutation({
     mutationFn: async ({ email, password }: { email: string, password: string }) => {
       try {
-        console.log("Enviando requisição de login para:", API_ENDPOINTS.LOGIN);
-        const response = await apiRequest('POST', API_ENDPOINTS.LOGIN, { email, password });
+        console.log("Enviando requisição de login para Supabase");
+        
+        const supabaseUrl = 'https://gqjfbdqgcjvdnbvcupcf.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamZiZHFnY2p2ZG5idmN1cGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0MDAzNjksImV4cCI6MjA2MTk3NjM2OX0.x-hqQJYG2dcdmAxu6MGdWEdUFI3GjffxGBvzat2oAX4';
+        
+        const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': supabaseKey
+          },
+          body: JSON.stringify({
+            email,
+            password
+          })
+        });
         
         // Verificar se a resposta foi bem-sucedida
         if (!response.ok) {
           const errorData = await response.json();
-          console.error("Resposta de erro do servidor:", errorData);
-          throw new Error(errorData.message || "Erro ao fazer login");
+          console.error("Resposta de erro do Supabase:", errorData);
+          throw new Error(errorData.message || errorData.error_description || "Erro ao fazer login");
         }
         
         const responseData = await response.json();
-        console.log("Resposta do servidor de login:", { ...responseData, senha: '[REMOVIDA]' });
-        return responseData;
+        console.log("Resposta do Supabase de login:", { ...responseData, access_token: '[REMOVIDO]' });
+        
+        localStorage.setItem('token', responseData.access_token);
+        localStorage.setItem('refresh_token', responseData.refresh_token);
+        localStorage.setItem('user_id', responseData.user.id);
+        
+        return {
+          id: responseData.user.id,
+          email: responseData.user.email,
+          name: responseData.user.user_metadata?.name || '',
+          role: responseData.user.user_metadata?.role || 'user',
+          active: true,
+          language: responseData.user.user_metadata?.language || 'pt-BR',
+          createdAt: new Date(responseData.user.created_at),
+          lastLoginAt: new Date(),
+        };
       } catch (error) {
         console.error("Erro no processo de login:", error);
         throw error;
@@ -121,7 +150,17 @@ export const useAuth = (): UseAuthReturn => {
   // Logout mutation
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest('POST', API_ENDPOINTS.LOGOUT);
+      // Usar o método de logout do Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error("Erro ao fazer logout:", error);
+        throw error;
+      }
+      
+      localStorage.removeItem('token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user_id');
     },
     onSuccess: () => {
       queryClient.clear(); // Clear all queries
