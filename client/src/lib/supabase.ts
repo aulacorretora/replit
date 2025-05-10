@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js';
-import { SUPABASE_TABLES } from './constants';
 
 // Supabase setup
 const supabaseUrl = 'https://gqjfbdqgcjvdnbvcupcf.supabase.co';
@@ -52,7 +51,7 @@ export const subscribeToMessages = (instanceId: number, onNewMessage: (message: 
       {
         event: 'INSERT',
         schema: 'public',
-        table: SUPABASE_TABLES.MESSAGES,
+        table: 'messages',
         filter: `instance_id=eq.${instanceId}`,
       },
       (payload) => {
@@ -74,7 +73,7 @@ export const subscribeToInstance = (instanceId: number, onUpdate: (instance: any
       {
         event: '*',
         schema: 'public',
-        table: SUPABASE_TABLES.INSTANCES,
+        table: 'instances',
         filter: `id=eq.${instanceId}`,
       },
       (payload) => {
@@ -96,7 +95,7 @@ export const subscribeToChats = (instanceId: number, onUpdate: (chat: any) => vo
       {
         event: '*',
         schema: 'public',
-        table: SUPABASE_TABLES.CHATS,
+        table: 'chats',
         filter: `instance_id=eq.${instanceId}`,
       },
       (payload) => {
