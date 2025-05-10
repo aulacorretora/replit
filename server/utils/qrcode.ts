@@ -16,3 +16,21 @@ export function formatQRCode(qrCode: string | null): string | null {
   
   return `data:image/png;base64,${qrCode}`;
 }
+
+/**
+ * Converte um QR code em texto para formato Base64
+ * @param qrText O texto do QR code gerado pelo Baileys
+ * @returns String Base64 do QR code
+ */
+export function qrTextToBase64(qrText: string): string {
+  try {
+    if (qrText.startsWith('data:image/png;base64,')) {
+      return qrText;
+    }
+    
+    return formatQRCode(qrText) || '';
+  } catch (error) {
+    console.error('Erro ao converter QR code para Base64:', error);
+    return '';
+  }
+}

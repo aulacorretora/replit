@@ -252,8 +252,8 @@ export const useInstance = (id?: number) => {
   } = useQuery({
     queryKey: ['instance', id, 'qr'],
     queryFn: () => getQrCode(id!),
-    enabled: enabled && !!instance && instance.status === 'qr_ready',
-    refetchInterval: instance?.status === 'qr_ready' ? 10000 : false, // Refetch every 10 seconds if QR is ready
+    enabled: enabled && !!instance && (instance.status === 'awaiting_qr' || instance.status === 'qr_ready'),
+    refetchInterval: (instance?.status === 'awaiting_qr' || instance?.status === 'qr_ready') ? 10000 : false, // Refetch every 10 seconds if QR is ready
     onSuccess: (data) => {
       if (data && data.qrCode) {
         setQrCode(data.qrCode);

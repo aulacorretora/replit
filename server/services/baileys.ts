@@ -184,7 +184,7 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
           
           // Update instance in storage with QR code
           await storage.updateInstance(instanceId, {
-            status: 'qr_ready',
+            status: 'awaiting_qr',
             qrCode: qr,
             qrCodeGeneratedAt: new Date().toISOString()
           });
@@ -655,7 +655,7 @@ export async function forceResetConnection(instanceId: number, userId: number): 
     });
     
     await storage.updateInstance(instanceId, {
-      status: 'qr_ready',
+      status: 'awaiting_qr',
       connected: false,
       qrCode,
       qrCodeGeneratedAt: new Date().toISOString()

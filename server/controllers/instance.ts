@@ -271,8 +271,8 @@ export const getQRCode = async (req: Request, res: Response) => {
       qrCode = getInstanceQRCode(instanceId);
     }
     
-    // Também verificar se a instância tem status 'qr_ready'
-    const isQrReady = instance.status === 'qr_ready' && instance.qrCode;
+    // Também verificar se a instância tem status 'awaiting_qr' ou 'qr_ready'
+    const isQrReady = (instance.status === 'awaiting_qr' || instance.status === 'qr_ready') && instance.qrCode;
     
     if (qrCode || isQrReady) {
       return res.json({ 
