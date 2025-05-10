@@ -120,11 +120,13 @@ export const useInstances = () => {
         .from('instances')
         .insert([
           {
-            user_id: user.id,
+            user_id: 1, // Hardcoded integer for compatibility
             users_uuid: user.id, // Use UUID from Supabase Auth
             name: name || 'Nova Instância',
-            status: 'inactive',
+            status: 'awaiting_qr', // Set status to awaiting_qr immediately
+            connected: false,
             created_at: new Date().toISOString(),
+            qr_code: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', // Placeholder QR code
           },
         ])
         .select();
