@@ -120,7 +120,6 @@ export const useInstances = () => {
         .from('instances')
         .insert([
           {
-            user_id: 1, // Temporary solution - set a default integer value
             users_uuid: user.id, // Use UUID from Supabase Auth
             name: name || 'Nova Instância',
             status: 'awaiting_qr', // Set status to awaiting_qr immediately
