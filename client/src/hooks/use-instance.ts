@@ -121,6 +121,7 @@ export const useInstances = () => {
         .insert([
           {
             user_id: user.id,
+            users_uuid: user.id, // Use UUID from Supabase Auth
             name: name || 'Nova Instância',
             status: 'inactive',
             created_at: new Date().toISOString(),
