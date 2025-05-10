@@ -75,7 +75,7 @@ if (!fs.existsSync(SESSION_PATH)) {
 const store = makeInMemoryStore({});
 
 // Initialize instance with QR code callback
-export async function initializeInstance(instanceId: number, userId: number, onQRCode: (qrCode: string) => void) {
+export async function initializeInstance(instanceId: number, userId: number, usersUuid: string | undefined, onQRCode: (qrCode: string) => void) {
   try {
     const instance = await storage.getInstance(instanceId);
     
@@ -415,7 +415,7 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
             // Auto reconnect unless logged out or explicitly disconnected
             setTimeout(() => {
               if (!instances.has(instanceId)) {
-                initializeInstance(instanceId, userId, onQRCode);
+                initializeInstance(instanceId, userId, undefined, onQRCode);
               }
             }, 5000);
           }
@@ -577,7 +577,7 @@ export function getInstanceQRCode(instanceId: number) {
 }
 
 // Force reset and generate new QR code
-export async function forceResetConnection(instanceId: number, userId: number): Promise<string | null> {
+export async function forceResetConnection(instanceId: number, userId: number, usersUuid?: string): Promise<string | null> {
   console.log(`Force resetting connection for instance ${instanceId}`);
   
   try {
@@ -637,7 +637,7 @@ export async function forceResetConnection(instanceId: number, userId: number): 
       
       // Initialize a new connection
       console.log(`Initializing new connection for instance ${instanceId}`);
-      initializeInstance(instanceId, userId, onQrCode)
+      initializeInstance(instanceId, userId, usersUuid, onQrCode)
         .catch(error => {
           clearTimeout(timeoutId);
           reject(error);

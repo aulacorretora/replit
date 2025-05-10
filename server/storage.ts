@@ -286,11 +286,44 @@ export class SupabaseStorage implements IStorage {
       .single();
       
     if (error) {
-      console.error('Error fetching instance by user:', error);
-      return undefined;
+      const { data: uuidData, error: uuidError } = await this.supabase
+        .from('instances')
+        .select('*')
+        .eq('users_uuid', userId.toString())
+        .single();
+        
+      if (uuidError) {
+        console.error('Error fetching instance by user:', error);
+        return undefined;
+      }
+      
+      return uuidData as Instance;
     }
     
     return data as Instance;
+  }
+  
+  async getInstancesByUser(userId: number): Promise<Instance[]> {
+    const { data, error } = await this.supabase
+      .from('instances')
+      .select('*')
+      .eq('user_id', userId);
+      
+    if (error || !data || data.length === 0) {
+      const { data: uuidData, error: uuidError } = await this.supabase
+        .from('instances')
+        .select('*')
+        .eq('users_uuid', userId.toString());
+        
+      if (uuidError) {
+        console.error('Error fetching instances by user:', error);
+        return [];
+      }
+      
+      return uuidData as Instance[];
+    }
+    
+    return data as Instance[];
   }
 
   async createInstance(instance: InsertInstance): Promise<Instance> {

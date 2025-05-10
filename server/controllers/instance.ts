@@ -84,6 +84,7 @@ export const createInstance = async (req: Request, res: Response) => {
     const instance = await storage.createInstance({
       ...req.body,
       userId,
+      usersUuid: req.user?.id, // Use UUID from Supabase Auth
       status: 'disconnected',
       connected: false,
     });
@@ -162,8 +163,9 @@ export const connectInstanceHandler = async (req: Request, res: Response) => {
       // Initialize WhatsApp connection with callback
       initializeInstance(
         instanceId, 
-        instance.userId, 
-        (qrCode) => resolve(qrCode)
+        instance.userId,
+        instance.usersUuid || undefined, // Pass the UUID from Supabase Auth
+        (qrCode: string) => resolve(qrCode)
       ).catch((error) => {
         console.error(`Error initializing instance ${instanceId}:`, error);
         resolve(null); // Resolve with null in case of error
@@ -220,7 +222,7 @@ export const resetInstanceHandler = async (req: Request, res: Response) => {
     }
     
     // Reset WhatsApp connection and generate new QR code
-    const qrCode = await forceResetConnection(instanceId, instance.userId);
+    const qrCode = await forceResetConnection(instanceId, instance.userId, instance.usersUuid || undefined);
     
     res.json({ 
       success: true, 
@@ -264,7 +266,7 @@ export const getQRCode = async (req: Request, res: Response) => {
     
     if (forceRefresh) {
       // Se for forçar atualização, tenta gerar um novo QR code
-      qrCode = await forceResetConnection(instanceId, instance.userId);
+      qrCode = await forceResetConnection(instanceId, instance.userId, instance.usersUuid || undefined);
       console.log(`QR code forçado para instância ${instanceId}: ${qrCode ? 'gerado' : 'falhou'}`);
     } else {
       // Caso contrário, usa o QR code existente

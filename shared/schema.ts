@@ -25,6 +25,7 @@ export const insertUserSchema = createInsertSchema(users).omit({
 export const instances = pgTable("instances", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  usersUuid: text("users_uuid"), // UUID do usuário do Supabase Auth
   name: text("name").notNull(),
   status: text("status").notNull().default("disconnected"),
   phoneNumber: text("phone_number"),
