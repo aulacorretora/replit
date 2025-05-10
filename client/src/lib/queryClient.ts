@@ -62,6 +62,20 @@ export async function apiRequest(
       return response;
     }
 
+    // Verificar se a resposta é um JSON válido para endpoints da API ou Supabase
+    if (url.includes('/api/') || url.includes('/auth/v1/')) {
+      const contentType = response.headers.get('content-type');
+      if (!response.ok) {
+        if (contentType && !contentType.includes('application/json')) {
+          console.error('Resposta de erro não é JSON válido:', contentType);
+          throw new Error(`Resposta inválida do servidor: esperado JSON, recebido ${contentType}. Status: ${response.status}`);
+        }
+      } else if (contentType && !contentType.includes('application/json')) {
+        console.error('Resposta não é JSON válido:', contentType);
+        throw new Error(`Resposta inválida do servidor: esperado JSON, recebido ${contentType}`);
+      }
+    }
+
     return response;
   } catch (error) {
     console.error('Erro na requisição:', error);
