@@ -278,7 +278,19 @@ export class SupabaseStorage implements IStorage {
     return data as Instance;
   }
 
-  async getInstanceByUser(userId: number): Promise<Instance | undefined> {
+  async getInstanceByUser(userId: number | string): Promise<Instance | undefined> {
+    if (typeof userId === 'string') {
+      const { data, error } = await this.supabase
+        .from('instances')
+        .select('*')
+        .eq('users_uuid', userId)
+        .single();
+        
+      if (!error && data) {
+        return data as Instance;
+      }
+    }
+    
     const { data, error } = await this.supabase
       .from('instances')
       .select('*')
@@ -294,9 +306,16 @@ export class SupabaseStorage implements IStorage {
   }
 
   async createInstance(instance: InsertInstance): Promise<Instance> {
+    const instanceData = { ...instance };
+    
+    if (instanceData.userId && typeof instanceData.userId === 'string') {
+      instanceData.usersUuid = instanceData.userId;
+      delete instanceData.userId; // Remove userId to avoid type conflicts
+    }
+    
     const { data, error } = await this.supabase
       .from('instances')
-      .insert(instance)
+      .insert(instanceData)
       .select()
       .single();
       

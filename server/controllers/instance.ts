@@ -42,7 +42,12 @@ export const getInstance = async (req: Request, res: Response) => {
     }
     
     // Verificar se o usuário tem acesso a essa instância
-    if (req.user?.role !== 'admin' && instance.userId !== req.user?.id) {
+    const userHasAccess = 
+      req.user?.role === 'admin' || 
+      instance.userId === req.user?.id || 
+      (typeof req.user?.id === 'string' && instance.usersUuid === req.user?.id);
+      
+    if (!userHasAccess) {
       return res.status(403).json({ message: 'Acesso negado a esta instância' });
     }
     
@@ -84,6 +89,7 @@ export const createInstance = async (req: Request, res: Response) => {
     const instance = await storage.createInstance({
       ...req.body,
       userId,
+      usersUuid: typeof userId === 'string' ? userId : undefined, // Add UUID if string
       status: 'disconnected',
       connected: false,
     });
@@ -113,7 +119,12 @@ export const deleteInstance = async (req: Request, res: Response) => {
     }
     
     // Verificar se o usuário tem acesso a essa instância
-    if (req.user?.role !== 'admin' && instance.userId !== req.user?.id) {
+    const userHasAccess = 
+      req.user?.role === 'admin' || 
+      instance.userId === req.user?.id || 
+      (typeof req.user?.id === 'string' && instance.usersUuid === req.user?.id);
+      
+    if (!userHasAccess) {
       return res.status(403).json({ message: 'Acesso negado a esta instância' });
     }
     
@@ -153,7 +164,12 @@ export const connectInstanceHandler = async (req: Request, res: Response) => {
     }
     
     // Verificar se o usuário tem acesso a essa instância
-    if (req.user?.role !== 'admin' && instance.userId !== req.user?.id) {
+    const userHasAccess = 
+      req.user?.role === 'admin' || 
+      instance.userId === req.user?.id || 
+      (typeof req.user?.id === 'string' && instance.usersUuid === req.user?.id);
+      
+    if (!userHasAccess) {
       return res.status(403).json({ message: 'Acesso negado a esta instância' });
     }
     
@@ -162,7 +178,7 @@ export const connectInstanceHandler = async (req: Request, res: Response) => {
       // Initialize WhatsApp connection with callback
       initializeInstance(
         instanceId, 
-        instance.userId, 
+        instance.usersUuid || instance.userId, // Use UUID if available, fall back to userId
         (qrCode) => resolve(qrCode)
       ).catch((error) => {
         console.error(`Error initializing instance ${instanceId}:`, error);
@@ -215,12 +231,17 @@ export const resetInstanceHandler = async (req: Request, res: Response) => {
     }
     
     // Verificar se o usuário tem acesso a essa instância
-    if (req.user?.role !== 'admin' && instance.userId !== req.user?.id) {
+    const userHasAccess = 
+      req.user?.role === 'admin' || 
+      instance.userId === req.user?.id || 
+      (typeof req.user?.id === 'string' && instance.usersUuid === req.user?.id);
+      
+    if (!userHasAccess) {
       return res.status(403).json({ message: 'Acesso negado a esta instância' });
     }
     
     // Reset WhatsApp connection and generate new QR code
-    const qrCode = await forceResetConnection(instanceId, instance.userId);
+    const qrCode = await forceResetConnection(instanceId, instance.usersUuid || instance.userId);
     
     res.json({ 
       success: true, 
@@ -255,7 +276,12 @@ export const getQRCode = async (req: Request, res: Response) => {
     }
     
     // Verificar se o usuário tem acesso a essa instância
-    if (req.user?.role !== 'admin' && instance.userId !== req.user?.id) {
+    const userHasAccess = 
+      req.user?.role === 'admin' || 
+      instance.userId === req.user?.id || 
+      (typeof req.user?.id === 'string' && instance.usersUuid === req.user?.id);
+      
+    if (!userHasAccess) {
       return res.status(403).json({ message: 'Acesso negado a esta instância' });
     }
     
@@ -264,7 +290,7 @@ export const getQRCode = async (req: Request, res: Response) => {
     
     if (forceRefresh) {
       // Se for forçar atualização, tenta gerar um novo QR code
-      qrCode = await forceResetConnection(instanceId, instance.userId);
+      qrCode = await forceResetConnection(instanceId, instance.usersUuid || instance.userId);
       console.log(`QR code forçado para instância ${instanceId}: ${qrCode ? 'gerado' : 'falhou'}`);
     } else {
       // Caso contrário, usa o QR code existente
@@ -304,7 +330,12 @@ export const disconnectInstanceHandler = async (req: Request, res: Response) => 
     }
     
     // Verificar se o usuário tem acesso a essa instância
-    if (req.user?.role !== 'admin' && instance.userId !== req.user?.id) {
+    const userHasAccess = 
+      req.user?.role === 'admin' || 
+      instance.userId === req.user?.id || 
+      (typeof req.user?.id === 'string' && instance.usersUuid === req.user?.id);
+      
+    if (!userHasAccess) {
       return res.status(403).json({ message: 'Acesso negado a esta instância' });
     }
     
