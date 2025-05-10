@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { API_ENDPOINTS } from '@/lib/constants';
 import { z } from 'zod';
+import supabase from '@/lib/supabase';
 
 type AuthUser = User | null;
 
@@ -76,19 +77,39 @@ export const useAuth = (): UseAuthReturn => {
   const loginMutation = useMutation({
     mutationFn: async ({ email, password }: { email: string, password: string }) => {
       try {
-        console.log("Enviando requisição de login para:", API_ENDPOINTS.LOGIN);
-        const response = await apiRequest('POST', API_ENDPOINTS.LOGIN, { email, password });
+        console.log("Enviando requisição de login para Supabase");
+        
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
         
         // Verificar se a resposta foi bem-sucedida
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Resposta de erro do servidor:", errorData);
-          throw new Error(errorData.message || "Erro ao fazer login");
+        if (error) {
+          console.error("Resposta de erro do Supabase:", error);
+          throw new Error(error.message || "Erro ao fazer login");
         }
         
-        const responseData = await response.json();
-        console.log("Resposta do servidor de login:", { ...responseData, senha: '[REMOVIDA]' });
-        return responseData;
+        if (!data || !data.user) {
+          throw new Error("Dados de usuário não retornados pelo Supabase");
+        }
+        
+        console.log("Resposta do Supabase de login:", { user: data.user, session: "..." });
+        
+        localStorage.setItem('token', data.session?.access_token || '');
+        localStorage.setItem('refresh_token', data.session?.refresh_token || '');
+        localStorage.setItem('user_id', data.user.id);
+        
+        return {
+          id: data.user.id,
+          email: data.user.email,
+          name: data.user.user_metadata?.name || '',
+          role: data.user.user_metadata?.role || 'user',
+          active: true,
+          language: data.user.user_metadata?.language || 'pt-BR',
+          createdAt: new Date(data.user.created_at),
+          lastLoginAt: new Date(),
+        };
       } catch (error) {
         console.error("Erro no processo de login:", error);
         throw error;
@@ -121,7 +142,17 @@ export const useAuth = (): UseAuthReturn => {
   // Logout mutation
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest('POST', API_ENDPOINTS.LOGOUT);
+      // Usar o método de logout do Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error("Erro ao fazer logout:", error);
+        throw error;
+      }
+      
+      localStorage.removeItem('token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user_id');
     },
     onSuccess: () => {
       queryClient.clear(); // Clear all queries
