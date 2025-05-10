@@ -135,6 +135,8 @@ export const deleteInstance = async (req: Request, res: Response) => {
   }
 };
 
+import { formatQRCode } from '../utils/qrcode';
+
 // POST /api/instances/:id/connect
 export const connectInstanceHandler = async (req: Request, res: Response) => {
   try {
@@ -177,7 +179,7 @@ export const connectInstanceHandler = async (req: Request, res: Response) => {
     if (qrCode) {
       return res.json({ 
         success: true, 
-        qrCode,
+        qrCode: formatQRCode(qrCode),
         message: 'QR code gerado com sucesso' 
       });
     } else {
@@ -222,7 +224,7 @@ export const resetInstanceHandler = async (req: Request, res: Response) => {
     
     res.json({ 
       success: true, 
-      qrCode,
+      qrCode: formatQRCode(qrCode),
       message: qrCode ? 'QR code gerado com sucesso' : 'Conexão reiniciada, mas QR code ainda não disponível'
     });
   } catch (error) {
@@ -274,7 +276,7 @@ export const getQRCode = async (req: Request, res: Response) => {
     
     if (qrCode || isQrReady) {
       return res.json({ 
-        qrCode: qrCode || instance.qrCode, 
+        qrCode: formatQRCode(qrCode || instance.qrCode), 
         timestamp: new Date().toISOString() 
       });
     } else {

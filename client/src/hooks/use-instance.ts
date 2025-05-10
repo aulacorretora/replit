@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/use-language';
+import { useAuth } from '@/hooks/use-auth';
+import supabase from '@/lib/supabase';
 
 // API Endpoints
 const INSTANCES_API = '/api/instances';
@@ -92,6 +94,7 @@ export const useInstances = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // Query para buscar todas as instâncias
   const { 
@@ -106,7 +109,37 @@ export const useInstances = () => {
 
   // Create instance mutation
   const createInstanceMutation = useMutation({
-    mutationFn: (name: string) => createInstance(name),
+    mutationFn: async (name: string) => {
+      console.log("Creating instance directly in Supabase");
+      
+      if (!user || !user.id) {
+        throw new Error('Usuário não autenticado');
+      }
+      
+      const { data, error } = await supabase
+        .from('instances')
+        .insert([
+          {
+            user_id: user.id,
+            name: name || 'Nova Instância',
+            status: 'inactive',
+            created_at: new Date().toISOString(),
+          },
+        ])
+        .select();
+      
+      if (error) {
+        console.error('Erro ao criar instância no Supabase:', error.message);
+        throw new Error(`Erro ao criar instância: ${error.message}`);
+      }
+      
+      if (!data || data.length === 0) {
+        throw new Error('Nenhum dado retornado ao criar instância');
+      }
+      
+      console.log("Instance created successfully in Supabase:", data[0]);
+      return data[0];
+    },
     onSuccess: (data) => {
       console.log("Instance created successfully:", data);
       
