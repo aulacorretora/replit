@@ -51,7 +51,23 @@ const getQrCode = async (id: number): Promise<{ qrCode: string | null }> => {
 };
 
 const createInstance = async (name: string): Promise<Instance> => {
-  const response = await apiRequest('POST', INSTANCES_API, { name });
+  const userIdStr = localStorage.getItem('user_id');
+  if (!userIdStr) {
+    throw new Error('Usuário não autenticado');
+  }
+  
+  const numericUserId = userIdStr
+    .split('-')
+    .map(part => parseInt(part, 16) || 0)
+    .reduce((acc, val) => acc + val, 0);
+  
+  console.log('Converting user ID from', userIdStr, 'to numeric ID:', numericUserId);
+  
+  const response = await apiRequest('POST', INSTANCES_API, { 
+    name,
+    userId: numericUserId 
+  });
+  
   if (!response.ok) {
     throw new Error('Falha ao criar instância');
   }
