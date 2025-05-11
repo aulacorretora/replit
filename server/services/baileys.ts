@@ -135,12 +135,9 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
       emitOwnEvents: true, // Enable to receive all events
       retryRequestDelayMs: 1000,
       markOnlineOnConnect: true, // Ensure device shows as online
-      patchMessageBeforeSending: true, // Ensure message format is correct
+      patchMessageBeforeSending: (msg) => msg, // Ensure message format is correct
       keepAliveIntervalMs: 25000, // Manter conexão ativa
-      transactionOpts: { // Configurações de transação
-        maxCommits: 10,
-        delayMs: 500
-      }
+      // Removed transactionOpts due to type incompatibility
     });
     
     // Connect store to socket
@@ -179,14 +176,14 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
           // Store QR code with timestamp in memory
           qrCodes.set(instanceId, {
             qrCode: qr,
-            timestamp: new Date().toISOString()
+            timestamp: new Date()
           });
           
           // Update instance in storage with QR code
           await storage.updateInstance(instanceId, {
             status: 'awaiting_qr',
             qrCode: qr,
-            qrCodeGeneratedAt: new Date().toISOString()
+            qrCodeGeneratedAt: new Date()
           });
           
           // Call the callback function to notify caller
@@ -200,20 +197,20 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
             instanceId,
             userId,
             status: 'qr_ready',
-            timestamp: new Date().toISOString()
+            timestamp: new Date()
           });
           
           // Send QR code via both event names for compatibility
           global.broadcastToUser(userId, 'qr', {
             instanceId,
             qrCode: qr,
-            timestamp: new Date().toISOString()
+            timestamp: new Date()
           });
           
           global.broadcastToUser(userId, 'qr_code', {
             instanceId,
             qrCode: qr,
-            timestamp: new Date().toISOString()
+            timestamp: new Date()
           });
           
           console.log(`QR code event broadcasted to user ${userId} for instance ${instanceId}`);
@@ -246,7 +243,7 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
         global.broadcastToUser(userId, 'qr_scanned', {
           instanceId,
           message: 'QR code escaneado! Conectando ao WhatsApp...',
-          timestamp: new Date().toISOString()
+          timestamp: new Date()
         });
         
         // Update status for all clients
@@ -255,7 +252,7 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
           userId,
           status: 'connecting',
           message: 'Autenticando com o WhatsApp...',
-          timestamp: new Date().toISOString()
+          timestamp: new Date()
         });
       }
       
@@ -273,7 +270,7 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
             status: 'connected',
             connected: true,
             phoneNumber: sock.user?.id.split(':')[0],
-            lastConnectedAt: new Date().toISOString(),
+            lastConnectedAt: new Date(),
             deviceInfo: phoneInfo
           });
           
@@ -284,13 +281,13 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
               instanceId,
               userId,
               status: 'connected',
-              timestamp: new Date().toISOString()
+              timestamp: new Date()
             });
             
             // Send specific notification to the owner
             global.broadcastToUser(userId, 'instance_connected', {
               instanceId,
-              timestamp: new Date().toISOString(),
+              timestamp: new Date(),
               phoneNumber: sock.user?.id.split(':')[0] || null
             });
             
@@ -307,7 +304,7 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
             instanceId,
             status: 'connecting',
             message: 'Autenticando com o WhatsApp...',
-            timestamp: new Date().toISOString()
+            timestamp: new Date()
           });
           
         } else if (connection === 'close') {
@@ -345,7 +342,7 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
               instanceId,
               status: 'error',
               message: 'Ambiente restrito detectado. O WhatsApp bloqueou a conexão. Tente na VPS zapban.com.',
-              timestamp: new Date().toISOString(),
+              timestamp: new Date(),
               error: disconnectReason
             });
             
@@ -392,7 +389,7 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
               instanceId,
               status: 'disconnected',
               message: 'Desconectado do WhatsApp. Faça login novamente.',
-              timestamp: new Date().toISOString()
+              timestamp: new Date()
             });
           } else {
             console.log(`Instance ${instanceId} disconnected, attempting reconnect... Reason: ${disconnectReason}`);
@@ -409,7 +406,7 @@ export async function initializeInstance(instanceId: number, userId: number, onQ
               instanceId,
               status: 'reconnecting',
               message: 'Reconectando ao WhatsApp...',
-              timestamp: new Date().toISOString()
+              timestamp: new Date()
             });
             
             // Auto reconnect unless logged out or explicitly disconnected
@@ -546,26 +543,31 @@ export function getInstanceQRCode(instanceId: number) {
   // Try to get from database synchronously (through instance already in cache)
   try {
     // This assumes getInstance has a local cache or it's a synchronous operation (like in MemStorage)
-    const instance = storage.getInstance(instanceId);
-    if (instance instanceof Promise) {
+    const instanceResult = storage.getInstance(instanceId);
+    if (instanceResult instanceof Promise) {
       // If it returns a promise, we can't use it synchronously - just log and continue
       console.log(`Can't get instance synchronously for ${instanceId}, skipping DB check`);
-    } else if (instance && instance.qrCode && instance.qrCodeGeneratedAt) {
+    } else if (instanceResult && 'qrCode' in instanceResult && 'qrCodeGeneratedAt' in instanceResult) {
+      const instance = instanceResult as Instance;
       // Check if still valid (60 seconds)
-      const expiryTime = new Date(instance.qrCodeGeneratedAt);
-      expiryTime.setSeconds(expiryTime.getSeconds() + 60);
-      
-      if (new Date() > expiryTime) {
-        console.log(`QR code for instance ${instanceId} expired in database`);
-      } else {
-        // Update in-memory cache
-        qrCodes.set(instanceId, {
-          qrCode: instance.qrCode,
-          timestamp: instance.qrCodeGeneratedAt
-        });
+      if (instance.qrCodeGeneratedAt) {
+        const expiryTime = new Date(instance.qrCodeGeneratedAt);
+        expiryTime.setSeconds(expiryTime.getSeconds() + 60);
         
-        console.log(`Returning valid QR code from database for instance ${instanceId}`);
-        return instance.qrCode;
+        if (new Date() > expiryTime) {
+          console.log(`QR code for instance ${instanceId} expired in database`);
+        } else {
+          // Update in-memory cache
+          qrCodes.set(instanceId, {
+            qrCode: instance.qrCode,
+            timestamp: instance.qrCodeGeneratedAt
+          });
+          
+          console.log(`Returning valid QR code from database for instance ${instanceId}`);
+          return instance.qrCode;
+        }
+      } else {
+        console.log(`QR code for instance ${instanceId} has no timestamp`);
       }
     }
   } catch (error) {
@@ -590,7 +592,8 @@ export async function forceResetConnection(instanceId: number, userId: number): 
         // Try to gracefully close the connection
         await existingSocket.logout();
       } catch (error) {
-        console.log(`Error logging out existing connection: ${error.message}`);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.log(`Error logging out existing connection: ${errorMessage}`);
         // Continue with cleanup even if logout fails
       }
       
@@ -620,7 +623,7 @@ export async function forceResetConnection(instanceId: number, userId: number): 
       instanceId,
       status: 'resetting',
       message: 'Limpando sessão e gerando novo QR code...',
-      timestamp: new Date().toISOString()
+      timestamp: new Date()
     });
     
     // Create a promise that will be resolved when we get a QR code
@@ -651,14 +654,14 @@ export async function forceResetConnection(instanceId: number, userId: number): 
     // Ensure the QR code is stored both in memory and database
     qrCodes.set(instanceId, {
       qrCode,
-      timestamp: new Date().toISOString()
+      timestamp: new Date()
     });
     
     await storage.updateInstance(instanceId, {
       status: 'awaiting_qr',
       connected: false,
       qrCode,
-      qrCodeGeneratedAt: new Date().toISOString()
+      qrCodeGeneratedAt: new Date()
     });
     
     return qrCode;
@@ -676,7 +679,7 @@ export async function forceResetConnection(instanceId: number, userId: number): 
       instanceId,
       status: 'failed',
       message: 'Falha ao reiniciar conexão. Tente novamente.',
-      timestamp: new Date().toISOString()
+      timestamp: new Date()
     });
     
     return null;
@@ -716,8 +719,8 @@ async function handleIncomingMessage(instanceId: number, userId: number, sock: a
     const messageId = message.key.id!;
     const messageTimestamp = message.messageTimestamp! as number;
     
-    // Format timestamp
-    const timestamp = new Date(messageTimestamp * 1000).toISOString();
+    // Create Date object from timestamp
+    const timestamp = new Date(messageTimestamp * 1000);
     
     // Get or create chat
     let chat = await storage.getChatByRemoteJid(instanceId, remoteJid);
@@ -945,7 +948,7 @@ export async function sendTextMessage(instanceId: number, userId: number, chatId
       mediaUrl: null,
       mediaType: null,
       status: 'sent',
-      timestamp: new Date().toISOString()
+      timestamp: new Date()
     };
     
     // Save message to database
@@ -1042,7 +1045,7 @@ export async function sendMediaMessage(
       mediaUrl: null, // In a real app, we would store URLs to our stored media
       mediaType: mimetype,
       status: 'sent',
-      timestamp: new Date().toISOString()
+      timestamp: new Date()
     };
     
     // Save message to database
@@ -1100,7 +1103,10 @@ export async function getInstanceStatus(instanceId: number) {
 }
 
 // Setup webhooks for Baileys events
-export function setupBaileysWebhooks(broadcast: Function, broadcastToUser: Function) {
+export function setupBaileysWebhooks(
+  broadcast: (type: string, payload: any) => void, 
+  broadcastToUser: (userId: number, type: string, payload: any) => void
+) {
   // Make these functions available globally for the message handlers
   global.broadcast = broadcast;
   global.broadcastToUser = broadcastToUser;
