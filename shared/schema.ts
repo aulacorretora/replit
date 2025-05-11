@@ -24,7 +24,8 @@ export const insertUserSchema = createInsertSchema(users).omit({
 // WhatsApp Instances
 export const instances = pgTable("instances", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  users_uuid: text("users_uuid"),
   name: text("name").notNull(),
   status: text("status").notNull().default("disconnected"),
   phoneNumber: text("phone_number"),
@@ -46,6 +47,8 @@ export const insertInstanceSchema = createInsertSchema(instances).omit({
   deviceInfo: true,
   connected: true,
   phoneNumber: true,
+}).extend({
+  users_uuid: z.string().uuid().optional(),
 });
 
 // Chats/Conversations

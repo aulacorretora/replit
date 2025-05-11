@@ -26,7 +26,7 @@ class WebSocketClient {
     try {
       const storedUserId = localStorage.getItem('user_id');
       if (storedUserId) {
-        userId = `/${storedUserId}`;
+        userId = `?userId=${storedUserId}`;
       }
     } catch (err) {
       console.error('Erro ao obter userId do localStorage:', err);
@@ -59,7 +59,7 @@ class WebSocketClient {
     try {
       const storedUserId = localStorage.getItem('user_id');
       if (storedUserId) {
-        userId = `/${storedUserId}`;
+        userId = `?userId=${storedUserId}`;
       }
     } catch (err) {
       console.error('Erro ao obter userId do localStorage para reconexão:', err);
