@@ -263,24 +263,45 @@ export const getQRCode = async (req: Request, res: Response) => {
     let qrCode = null;
     
     if (forceRefresh) {
-      // Se for forçar atualização, tenta gerar um novo QR code
-      qrCode = await forceResetConnection(instanceId, instance.userId);
-      console.log(`QR code forçado para instância ${instanceId}: ${qrCode ? 'gerado' : 'falhou'}`);
-    } else {
-      // Caso contrário, usa o QR code existente
+      try {
+        // Se for forçar atualização, tenta gerar um novo QR code
+        qrCode = await forceResetConnection(instanceId, instance.userId);
+        console.log(`QR code forçado para instância ${instanceId}: ${qrCode ? 'gerado' : 'falhou'}`);
+      } catch (resetError) {
+        console.error(`Erro ao forçar reset para instância ${instanceId}:`, resetError);
+        // Continuar e tentar usar o QR code existente
+      }
+    }
+    
+    if (!qrCode) {
+      // tenta usar o QR code existente
       qrCode = getInstanceQRCode(instanceId);
+      
+      // Se ainda não tiver QR code, tenta usar o armazenado na instância
+      if (!qrCode && instance.qrCode) {
+        qrCode = instance.qrCode;
+      }
     }
     
     // Também verificar se a instância tem status 'awaiting_qr' ou 'qr_ready'
-    const isQrReady = (instance.status === 'awaiting_qr' || instance.status === 'qr_ready') && instance.qrCode;
+    const isQrReady = (instance.status === 'awaiting_qr' || instance.status === 'qr_ready');
     
-    if (qrCode || isQrReady) {
+    if (qrCode || (isQrReady && instance.qrCode)) {
       return res.json({ 
-        qrCode: formatQRCode(qrCode || instance.qrCode), 
+        qrCode: formatQRCode(qrCode || instance.qrCode || ''), 
         timestamp: new Date().toISOString() 
       });
     } else {
-      return res.status(404).json({ message: 'QR code não disponível para esta instância' });
+      try {
+        await initializeInstance(instanceId, instance.userId, () => {});
+        return res.json({
+          message: 'Conexão iniciada, aguarde o QR code',
+          timestamp: new Date().toISOString()
+        });
+      } catch (initError) {
+        console.error(`Erro ao iniciar conexão para instância ${instanceId}:`, initError);
+        return res.status(404).json({ message: 'QR code não disponível para esta instância' });
+      }
     }
   } catch (error) {
     console.error('Error getting QR code:', error);
