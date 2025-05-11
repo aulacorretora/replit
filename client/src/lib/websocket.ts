@@ -5,8 +5,8 @@ type StatusChangeHandler = (status: boolean) => void;
 
 class WebSocketClient {
   private socket: WebSocket | null = null;
-  private reconnectTimer: number | null = null;
-  private heartbeatTimer: number | null = null;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
   private messageHandlers: Map<string, Set<MessageHandler>> = new Map();
   private statusChangeHandlers: Set<StatusChangeHandler> = new Set();
   private isConnected: boolean = false;

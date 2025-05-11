@@ -338,7 +338,7 @@ export default function Instances() {
       <InstanceStatusModal
         open={statusModalOpen}
         onClose={() => setStatusModalOpen(false)}
-        instance={selectedInstance || null}
+        instance={selectedInstance as any || null}
         onDisconnect={() => {
           disconnectInstance();
           setStatusModalOpen(false);

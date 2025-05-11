@@ -7,6 +7,16 @@ import { formatDistanceToNow } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
 import { Instance } from '@shared/schema';
 
+interface DeviceInfo {
+  phone?: {
+    device_model?: string;
+    os_version?: string;
+    battery?: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
 interface InstanceStatusModalProps {
   open: boolean;
   onClose: () => void;
@@ -31,10 +41,10 @@ export default function InstanceStatusModal({
   const { t, language } = useLanguage();
   
   // Format time string
-  const formatTime = (timestamp?: string) => {
+  const formatTime = (timestamp?: string | Date | null) => {
     if (!timestamp) return '';
     
-    const date = new Date(timestamp);
+    const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
     const dateLocale = language === 'pt-BR' ? ptBR : enUS;
     
     return formatDistanceToNow(date, { 
@@ -66,7 +76,7 @@ export default function InstanceStatusModal({
             <div className="pl-5">
               <p className="text-sm text-neutral-600 mb-1">
                 {instance.connected 
-                  ? t('instance.connectedSince', { time: formatTime(instance.lastConnectedAt) })
+                  ? t('instance.connectedSince').replace('{time}', formatTime(instance.lastConnectedAt))
                   : t('instance.disconnected')
                 }
               </p>
@@ -77,19 +87,59 @@ export default function InstanceStatusModal({
           </div>
           
           <div className="space-y-4">
-            {instance.deviceInfo && (
-              <div className="p-4 bg-neutral-50 rounded-lg">
-                <h4 className="text-sm font-medium text-neutral-700 mb-2">{t('instance.deviceInfo')}</h4>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="text-neutral-500">{t('instance.deviceModel')}:</div>
-                  <div className="text-neutral-700">{instance.deviceInfo.phone.device_model || '-'}</div>
-                  <div className="text-neutral-500">{t('instance.os')}:</div>
-                  <div className="text-neutral-700">{instance.deviceInfo.phone.os_version || '-'}</div>
-                  <div className="text-neutral-500">{t('instance.battery')}:</div>
-                  <div className="text-neutral-700">{instance.deviceInfo.phone.battery || '-'}</div>
+            {(() => {
+              if (!instance.deviceInfo) return null;
+              
+              return (
+                <div className="p-4 bg-neutral-50 rounded-lg">
+                  <h4 className="text-sm font-medium text-neutral-700 mb-2">{t('instance.deviceInfo')}</h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="text-neutral-500">{t('instance.deviceModel')}:</div>
+                    <div className="text-neutral-700">
+                      {(() => {
+                        try {
+                          const deviceInfo = instance.deviceInfo as any;
+                          return deviceInfo && 
+                            deviceInfo.phone && 
+                            deviceInfo.phone.device_model ? 
+                            String(deviceInfo.phone.device_model) : '-';
+                        } catch (e) {
+                          return '-';
+                        }
+                      })()}
+                    </div>
+                    <div className="text-neutral-500">{t('instance.os')}:</div>
+                    <div className="text-neutral-700">
+                      {(() => {
+                        try {
+                          const deviceInfo = instance.deviceInfo as any;
+                          return deviceInfo && 
+                            deviceInfo.phone && 
+                            deviceInfo.phone.os_version ? 
+                            String(deviceInfo.phone.os_version) : '-';
+                        } catch (e) {
+                          return '-';
+                        }
+                      })()}
+                    </div>
+                    <div className="text-neutral-500">{t('instance.battery')}:</div>
+                    <div className="text-neutral-700">
+                      {(() => {
+                        try {
+                          const deviceInfo = instance.deviceInfo as any;
+                          return deviceInfo && 
+                            deviceInfo.phone && 
+                            deviceInfo.phone.battery ? 
+                            String(deviceInfo.phone.battery) : '-';
+                        } catch (e) {
+                          return '-';
+                        }
+                      })()}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
             
             <div className="p-4 bg-neutral-50 rounded-lg">
               <h4 className="text-sm font-medium text-neutral-700 mb-2">{t('instance.statistics')}</h4>
