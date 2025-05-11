@@ -131,7 +131,7 @@ function WebSocketManager() {
       // Add a small delay to ensure connection is established
       const timer = setTimeout(() => {
         // Only send if socket is ready
-        wsInstance.send('identify', { userId: user.id });
+        wsInstance.send('identify', { user_id: user.id });
         console.log(`WebSocket identified as user ${user.id}`);
         setHasIdentified(true);
       }, 1000);
