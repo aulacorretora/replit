@@ -5,8 +5,8 @@ type StatusChangeHandler = (status: boolean) => void;
 
 class WebSocketClient {
   private socket: WebSocket | null = null;
-  private reconnectTimer: NodeJS.Timeout | null = null;
-  private heartbeatTimer: NodeJS.Timeout | null = null;
+  private reconnectTimer: number | null = null;
+  private heartbeatTimer: number | null = null;
   private messageHandlers: Map<string, Set<MessageHandler>> = new Map();
   private statusChangeHandlers: Set<StatusChangeHandler> = new Set();
   private isConnected: boolean = false;
@@ -42,7 +42,7 @@ class WebSocketClient {
       return;
     }
     
-    if (this.socket && this.socket.readyState !== WebSocket.CLOSED) {
+    if (this.socket && (this.socket.readyState as number) !== 3) { // 3=CLOSED
       console.log(`Socket exists in state ${this.socket.readyState}, not creating a new one`);
       return;
     }
@@ -114,7 +114,7 @@ class WebSocketClient {
       // A conexão será fechada automaticamente pelo browser na maioria dos casos de erro
       // Apenas agendar uma tentativa de reconexão se a conexão não fechar automaticamente
       setTimeout(() => {
-        if (this.socket && this.socket.readyState !== WebSocket.CLOSED && this.socket.readyState !== WebSocket.CLOSING) {
+        if (this.socket && (this.socket.readyState as number) !== 3 && (this.socket.readyState as number) !== 2) { // 3=CLOSED, 2=CLOSING
           console.log('Conexão ainda aberta após erro, tentando fechar e reconectar...');
           this.socket.close();
         }
@@ -168,11 +168,11 @@ class WebSocketClient {
   }
 
   send(type: string, payload: any): void {
-    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+    if (!this.socket || (this.socket.readyState as number) !== 1) { // 1=OPEN
       console.error('WebSocket is not connected');
       // Queue the message to be sent when the socket connects
       this.connectWithRetry().then(() => {
-        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        if (this.socket && (this.socket.readyState as number) === 1) { // 1=OPEN
           this.socket.send(JSON.stringify({ type, payload }));
           console.log(`Queued message ${type} sent after reconnection`);
         }
@@ -193,7 +193,7 @@ class WebSocketClient {
   private async connectWithRetry(): Promise<void> {
     return new Promise((resolve, reject) => {
       // If already connected, resolve immediately
-      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      if (this.socket && (this.socket.readyState as number) === 1) { // 1=OPEN
         resolve();
         return;
       }
@@ -262,7 +262,7 @@ class WebSocketClient {
       console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
       
       // Only attempt reconnect if not currently connecting
-      if (!this.connecting && (!this.socket || this.socket.readyState === WebSocket.CLOSED)) {
+      if (!this.connecting && (!this.socket || (this.socket.readyState as number) === 3)) { // 3=CLOSED
         this.connect();
       } else {
         console.log('Skipping reconnect attempt as connection already in progress');
@@ -285,18 +285,18 @@ class WebSocketClient {
     // Start a new heartbeat timer
     this.heartbeatTimer = setInterval(() => {
       if (this.socket) {
-        if (this.socket.readyState === WebSocket.OPEN) {
+        if ((this.socket.readyState as number) === 1) { // 1=OPEN
           try {
             // Send ping message
             this.send('ping', { time: new Date().toISOString() });
           } catch (error) {
             console.error('Error sending heartbeat:', error);
             // Try to reconnect if error sending heartbeat
-            if (this.socket.readyState !== WebSocket.CONNECTING) {
+            if ((this.socket.readyState as number) !== 0 && (this.socket.readyState as number) !== 3) { // 0=CONNECTING, 3=CLOSED
               this.socket.close();
             }
           }
-        } else if (this.socket.readyState === WebSocket.CLOSED || this.socket.readyState === WebSocket.CLOSING) {
+        } else if ((this.socket.readyState as number) === 3 || (this.socket.readyState as number) === 2) { // 3=CLOSED, 2=CLOSING
           // If socket is closed or closing, try to reconnect
           this.connect();
         }

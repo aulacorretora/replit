@@ -101,13 +101,13 @@ export function useChatWebSocket(chatId: number) {
 
   const handleNewMessage = useCallback((data: any) => {
     if (data.chatId === chatId) {
-      setNewMessages(prev => [...prev, data]);
+      setNewMessages((prev: any[]) => [...prev, data]);
     }
   }, [chatId]);
 
   const handleMessageStatus = useCallback((data: any) => {
     if (data.chatId === chatId) {
-      setMessageStatusUpdates(prev => [...prev, data]);
+      setMessageStatusUpdates((prev: any[]) => [...prev, data]);
     }
   }, [chatId]);
 
