@@ -184,7 +184,7 @@ export const connectInstanceHandler = async (req: Request, res: Response) => {
       // Initialize WhatsApp connection with callback
       initializeInstance(
         instanceId, 
-        instance.userId, 
+        instance.userId || 0, // Provide default value if userId is null
         (qrCode) => resolve(qrCode)
       ).catch((error) => {
         console.error(`Error initializing instance ${instanceId}:`, error);
@@ -242,7 +242,7 @@ export const resetInstanceHandler = async (req: Request, res: Response) => {
     }
     
     // Reset WhatsApp connection and generate new QR code
-    const qrCode = await forceResetConnection(instanceId, instance.userId);
+    const qrCode = await forceResetConnection(instanceId, instance.userId || 0); // Provide default value if userId is null
     
     res.json({ 
       success: true, 
@@ -287,7 +287,7 @@ export const getQRCode = async (req: Request, res: Response) => {
     if (forceRefresh) {
       try {
         // Se for forçar atualização, tenta gerar um novo QR code
-        qrCode = await forceResetConnection(instanceId, instance.userId);
+        qrCode = await forceResetConnection(instanceId, instance.userId || 0); // Provide default value if userId is null
         console.log(`QR code forçado para instância ${instanceId}: ${qrCode ? 'gerado' : 'falhou'}`);
       } catch (resetError) {
         console.error(`Erro ao forçar reset para instância ${instanceId}:`, resetError);
@@ -315,7 +315,7 @@ export const getQRCode = async (req: Request, res: Response) => {
       });
     } else {
       try {
-        await initializeInstance(instanceId, instance.userId, () => {});
+        await initializeInstance(instanceId, instance.userId || 0, () => {}); // Provide default value if userId is null
         return res.json({
           message: 'Conexão iniciada, aguarde o QR code',
           timestamp: new Date().toISOString()
