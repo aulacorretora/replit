@@ -71,7 +71,23 @@ export const createInstance = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'ID de usuário inválido' });
     }
     
-    // Validate request body
+    // Check for users_uuid in request body
+    const usersUuid = req.body.users_uuid;
+    
+    if (usersUuid) {
+      console.log('Creating instance with users_uuid:', usersUuid);
+      
+      // Create instance with users_uuid
+      const instance = await storage.createInstance({
+        ...req.body,
+        status: 'awaiting_qr',
+        connected: false,
+      });
+      
+      console.log('Instance created with users_uuid:', instance);
+      return res.status(200).json(instance);
+    }
+    
     try {
       insertInstanceSchema.parse({
         ...req.body,
@@ -86,7 +102,7 @@ export const createInstance = async (req: Request, res: Response) => {
       }
     }
     
-    // Create instance
+    // Create instance with userId
     const instance = await storage.createInstance({
       ...req.body,
       userId: userIdNumber,
