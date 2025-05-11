@@ -32,7 +32,7 @@ class WebSocketClient {
       console.error('Erro ao obter userId do localStorage:', err);
     }
     
-    this.url = `${protocol}//${window.location.host}/ws${userId}`;
+    this.url = `${protocol}//${window.location.host}/ws${userId ? userId : ''}`;
     
     console.log(`WebSocket URL: ${this.url}`);
   }
@@ -64,7 +64,7 @@ class WebSocketClient {
     } catch (err) {
       console.error('Erro ao obter userId do localStorage para reconexão:', err);
     }
-    this.url = `${protocol}//${window.location.host}/ws${userId}`;
+    this.url = `${protocol}//${window.location.host}/ws${userId ? userId : ''}`;
     
     console.log(`WebSocket URL: ${this.url}`);
     
