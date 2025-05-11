@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/use-auth';
 import supabase from '@/lib/supabase';
 
 // API Endpoints
-const INSTANCES_API = '/api/instances';
+const INSTANCES_API = '/instances';
 
 // Interfaces para tipagem
 interface Instance {
