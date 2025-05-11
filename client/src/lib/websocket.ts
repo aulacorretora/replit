@@ -33,6 +33,8 @@ class WebSocketClient {
     }
     
     this.url = `${protocol}//${window.location.host}/ws${userId}`;
+    
+    console.log(`WebSocket URL: ${this.url}`);
   }
 
   connect(): void {
@@ -63,6 +65,8 @@ class WebSocketClient {
       console.error('Erro ao obter userId do localStorage para reconexão:', err);
     }
     this.url = `${protocol}//${window.location.host}/ws${userId}`;
+    
+    console.log(`WebSocket URL: ${this.url}`);
     
     // If socket is null or CLOSED, create a new one
     this.socket = new WebSocket(this.url);
