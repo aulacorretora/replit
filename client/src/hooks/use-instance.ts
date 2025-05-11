@@ -70,8 +70,12 @@ const createInstance = async (name: string): Promise<Instance> => {
 };
 
 const deleteInstance = async (id: number): Promise<void> => {
+  console.log(`Deleting instance with ID: ${id}`);
   const response = await apiRequest('DELETE', `${INSTANCES_API}/${id}`);
   if (!response.ok) {
+    console.error(`Error deleting instance: ${response.status} ${response.statusText}`);
+    const text = await response.text().catch(() => 'No response text');
+    console.error(`Response body: ${text}`);
     throw new Error('Falha ao excluir instância');
   }
 };

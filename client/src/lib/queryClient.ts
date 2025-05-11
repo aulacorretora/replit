@@ -41,8 +41,11 @@ export async function apiRequest(
   }
 
   // Usar a URL completa, garantindo que os endpoints da API sejam acessados corretamente
-  // Não importa se a URL já tiver o prefixo /api, isso garante que sempre será o endereço correto
-  const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+  const fullUrl = url.startsWith('http') 
+    ? url 
+    : url.startsWith('/api') 
+      ? url 
+      : `${API_BASE_URL}${url}`;
 
   try {
     const response = await fetch(fullUrl, options);
