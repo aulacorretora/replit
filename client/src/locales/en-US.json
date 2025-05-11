@@ -162,7 +162,10 @@
     "needHelp": "Need help?",
     "cancel": "Cancel",
     "newQrCode": "Generate new QR Code",
-    "generating": "Generating..."
+    "generating": "Generating...",
+    "forceReset": "Force Reset",
+    "resetting": "Resetting...",
+    "resetDescription": "Resetting connection..."
   },
   "instance": {
     "statusTitle": "Instance Status",

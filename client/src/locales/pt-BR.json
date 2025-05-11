@@ -167,7 +167,10 @@
     "needHelp": "Precisa de ajuda?",
     "cancel": "Cancelar",
     "newQrCode": "Gerar novo QR Code",
-    "generating": "Gerando..."
+    "generating": "Gerando...",
+    "forceReset": "Forçar Reset",
+    "resetting": "Reiniciando...",
+    "resetDescription": "Reiniciando conexão..."
   },
   "instance": {
     "statusTitle": "Status da Instância",
