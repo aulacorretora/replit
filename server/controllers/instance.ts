@@ -65,11 +65,17 @@ export const createInstance = async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Usuário não autenticado' });
     }
     
+    const userIdNumber = typeof userId === 'string' ? parseInt(userId, 10) : userId;
+    
+    if (isNaN(userIdNumber)) {
+      return res.status(400).json({ message: 'ID de usuário inválido' });
+    }
+    
     // Validate request body
     try {
       insertInstanceSchema.parse({
         ...req.body,
-        userId,
+        userId: userIdNumber,
       });
     } catch (validationError) {
       if (validationError instanceof z.ZodError) {
@@ -83,8 +89,8 @@ export const createInstance = async (req: Request, res: Response) => {
     // Create instance
     const instance = await storage.createInstance({
       ...req.body,
-      userId,
-      status: 'disconnected',
+      userId: userIdNumber,
+      status: 'awaiting_qr',
       connected: false,
     });
     
