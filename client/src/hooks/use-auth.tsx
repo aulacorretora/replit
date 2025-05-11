@@ -103,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           localStorage.setItem('zapban_user', JSON.stringify(userData));
           // Salvar o ID separadamente para o WebSocket
           if (userData && userData.id) {
-            localStorage.setItem('userId', userData.id.toString());
+            localStorage.setItem('user_id', userData.id.toString());
           }
           return userData;
         }
@@ -156,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData([API_ENDPOINTS.USER], userData);
       // Salvar dados do usuário no localStorage
       localStorage.setItem('zapban_user', JSON.stringify(userData));
-      localStorage.setItem('userId', userData.id.toString());
+      localStorage.setItem('user_id', userData.id.toString());
       toast({
         title: "Login realizado com sucesso",
         description: `Bem-vindo(a), ${userData.name}!`,
@@ -191,7 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData([API_ENDPOINTS.USER], userData);
       // Salvar dados do usuário no localStorage
       localStorage.setItem('zapban_user', JSON.stringify(userData));
-      localStorage.setItem('userId', userData.id.toString());
+      localStorage.setItem('user_id', userData.id.toString());
       toast({
         title: "Cadastro realizado com sucesso",
         description: `Conta criada para ${userData.name}.`,
@@ -225,7 +225,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData([API_ENDPOINTS.USER], null);
       // Limpar dados do usuário do localStorage
       localStorage.removeItem('zapban_user');
-      localStorage.removeItem('userId');
+      localStorage.removeItem('user_id');
       toast({
         title: "Logout realizado",
         description: "Você foi desconectado com sucesso.",

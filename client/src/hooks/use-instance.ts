@@ -51,21 +51,16 @@ const getQrCode = async (id: number): Promise<{ qrCode: string | null }> => {
 };
 
 const createInstance = async (name: string): Promise<Instance> => {
-  const userIdStr = localStorage.getItem('user_id');
-  if (!userIdStr) {
+  const userUuid = localStorage.getItem('user_id');
+  if (!userUuid) {
     throw new Error('Usuário não autenticado');
   }
   
-  const numericUserId = userIdStr
-    .split('-')
-    .map(part => parseInt(part, 16) || 0)
-    .reduce((acc, val) => acc + val, 0);
-  
-  console.log('Converting user ID from', userIdStr, 'to numeric ID:', numericUserId);
+  console.log('Using user UUID for instance creation:', userUuid);
   
   const response = await apiRequest('POST', INSTANCES_API, { 
     name,
-    userId: numericUserId 
+    users_uuid: userUuid 
   });
   
   if (!response.ok) {
