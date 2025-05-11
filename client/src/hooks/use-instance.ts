@@ -110,35 +110,13 @@ export const useInstances = () => {
   // Create instance mutation
   const createInstanceMutation = useMutation({
     mutationFn: async (name: string) => {
-      console.log("Creating instance directly in Supabase");
+      console.log("Creating instance using API endpoint");
       
       if (!user || !user.id) {
         throw new Error('Usuário não autenticado');
       }
       
-      const { data, error } = await supabase
-        .from('instances')
-        .insert([
-          {
-            user_id: user.id,
-            name: name || 'Nova Instância',
-            status: 'inactive',
-            created_at: new Date().toISOString(),
-          },
-        ])
-        .select();
-      
-      if (error) {
-        console.error('Erro ao criar instância no Supabase:', error.message);
-        throw new Error(`Erro ao criar instância: ${error.message}`);
-      }
-      
-      if (!data || data.length === 0) {
-        throw new Error('Nenhum dado retornado ao criar instância');
-      }
-      
-      console.log("Instance created successfully in Supabase:", data[0]);
-      return data[0];
+      return createInstance(name);
     },
     onSuccess: (data) => {
       console.log("Instance created successfully:", data);
@@ -190,9 +168,13 @@ export const useInstances = () => {
   const deleteInstanceMutation = useMutation({
     mutationFn: (id: number) => deleteInstance(id),
     onSuccess: (_, id) => {
+      console.log("Instance deleted successfully:", id);
+      
       // Invalidar todas as queries relacionadas às instâncias
       queryClient.invalidateQueries({ queryKey: ['instances'] });
       queryClient.invalidateQueries({ queryKey: ['instance', id] });
+      
+      refetchInstances();
       
       toast({
         title: t('instances.deleted'),
@@ -266,14 +248,43 @@ export const useInstance = (id?: number) => {
     if (!id) return;
     
     try {
+      console.log("Generating QR code for instance:", id);
+      
+      try {
+        await connectInstance(id);
+        console.log("Instance connection initiated before QR code generation");
+      } catch (connectError) {
+        console.warn("Could not connect instance before QR code generation:", connectError);
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       const response = await apiRequest('GET', `${INSTANCES_API}/${id}/qr?force=true`);
-      if (!response.ok) throw new Error('Falha ao gerar QR code');
+      if (!response.ok) {
+        console.error("QR code request failed with status:", response.status);
+        
+        console.log("Trying reset endpoint as fallback");
+        const resetResponse = await apiRequest('POST', `${INSTANCES_API}/${id}/reset`);
+        if (!resetResponse.ok) throw new Error('Falha ao gerar QR code');
+        
+        const resetData = await resetResponse.json();
+        if (resetData && resetData.qrCode) {
+          console.log("QR code generated successfully via reset endpoint");
+          setQrCode(resetData.qrCode);
+          return resetData.qrCode;
+        }
+        
+        throw new Error('QR code não disponível após reset');
+      }
       
       const data = await response.json();
       if (data && data.qrCode) {
+        console.log("QR code generated successfully");
         setQrCode(data.qrCode);
         return data.qrCode;
       }
+      
+      console.error("QR code not available in response:", data);
       return null;
     } catch (error) {
       console.error('Error generating QR code:', error);
@@ -284,7 +295,7 @@ export const useInstance = (id?: number) => {
       });
       return null;
     }
-  }, [id, toast, t]);
+  }, [id, toast, t, connectInstance]);
 
   // Connect instance
   const connectInstanceMutation = useMutation({
