@@ -47,7 +47,7 @@ export interface IStorage {
   // Instance operations
   getInstance(id: number): Promise<Instance | undefined>;
   getInstanceByUser(userId: number): Promise<Instance | undefined>;
-  getInstancesByUser(userId: number): Promise<Instance[]>;
+  getInstancesByUser(userId: number | string): Promise<Instance[]>;
   createInstance(instance: InsertInstance): Promise<Instance>;
   updateInstance(id: number, data: Partial<Instance>): Promise<Instance | undefined>;
   deleteInstance(id: number): Promise<boolean>;
@@ -278,12 +278,18 @@ export class SupabaseStorage implements IStorage {
     return data as Instance;
   }
 
-  async getInstanceByUser(userId: number): Promise<Instance | undefined> {
-    const { data, error } = await this.supabase
+  async getInstanceByUser(userId: number | string): Promise<Instance | undefined> {
+    let query = this.supabase
       .from('instances')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
+      .select('*');
+      
+    if (typeof userId === 'number') {
+      query = query.eq('user_id', userId);
+    } else {
+      query = query.eq('users_uuid', userId);
+    }
+    
+    const { data, error } = await query.single();
       
     if (error) {
       console.error('Error fetching instance by user:', error);
@@ -292,6 +298,28 @@ export class SupabaseStorage implements IStorage {
     
     return data as Instance;
   }
+  async getInstancesByUser(userId: number | string): Promise<Instance[]> {
+    let query = this.supabase
+      .from('instances')
+      .select('*, user:user_id(*)');
+      
+    if (typeof userId === 'number') {
+      query = query.eq('user_id', userId);
+    } else {
+      query = query.eq('users_uuid', userId);
+    }
+    
+    const { data, error } = await query.order('created_at', { ascending: false });
+      
+    if (error) {
+      console.error('Error fetching instances by user:', error);
+      return [];
+    }
+    
+    return data as Instance[];
+  }
+
+
 
   async createInstance(instance: InsertInstance): Promise<Instance> {
     const { data, error } = await this.supabase
@@ -838,15 +866,27 @@ export class MemStorage implements IStorage {
     return { ...instance, user } as Instance;
   }
 
-  async getInstanceByUser(userId: number): Promise<Instance | undefined> {
+  async getInstanceByUser(userId: number | string): Promise<Instance | undefined> {
     return Array.from(this.instances.values()).find(
-      (instance) => instance.userId === userId
+      (instance) => {
+        if (typeof userId === 'number') {
+          return instance.userId === userId;
+        } else {
+          return instance.users_uuid === userId;
+        }
+      }
     );
   }
   
-  async getInstancesByUser(userId: number): Promise<Instance[]> {
+  async getInstancesByUser(userId: number | string): Promise<Instance[]> {
     return Array.from(this.instances.values()).filter(
-      instance => instance.userId === userId
+      instance => {
+        if (typeof userId === 'number') {
+          return instance.userId === userId;
+        } else {
+          return instance.users_uuid === userId;
+        }
+      }
     );
   }
 
