@@ -173,9 +173,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/instances', instanceRoutes);
   app.use('/api/chats', chatRoutes);
   app.use('/api', webhookRoutes);  // Webhook routes (não requer auth)
-  app.use('/api', aiAgentRoutes);  // Rotas de agentes de IA
-  app.use('/api', automationRoutes); // Rotas de automação
-  app.use('/api', apiKeyRoutes);   // Rotas de chaves API
+  app.use('/api/ai-agents', aiAgentRoutes);  // Rotas de agentes de IA
+  app.use('/api/automations', automationRoutes); // Rotas de automação
+  app.use('/api/user/api-keys', apiKeyRoutes);   // Rotas de chaves API
   
   // Create HTTP server
   const httpServer = createServer(app);
@@ -322,16 +322,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // As rotas de autenticação são registradas em server/auth.ts no setupAuth
-  // Estas são as rotas secundárias
-  app.use('/api/admin', adminRoutes);
-  app.use('/api/instances', instanceRoutes);
-  app.use('/api/chats', chatRoutes);
-  app.use('/api/webhooks', webhookRoutes);
-  
-  // Registrar rotas para agentes de IA, automações e chaves de API
-  app.use(aiAgentRoutes);
-  app.use(automationRoutes);
-  app.use(apiKeyRoutes);
   
   // Registrar rotas para grupos
   app.get('/api/instances/:instanceId/groups', getGroupsByInstance);
