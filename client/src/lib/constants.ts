@@ -4,64 +4,64 @@ export const API_BASE_URL = '/api';
 // API Endpoints
 export const API_ENDPOINTS = {
   // Auth - essas rotas já são prefixadas com /api/auth no servidor
-  LOGIN: `/api/auth/login`,
-  REGISTER: `/api/auth/register`,
-  LOGOUT: `/api/auth/logout`,
-  USER: `/api/auth/user`,
-  FORGOT_PASSWORD: `/api/auth/forgot-password`,
-  RESET_PASSWORD: `/api/auth/reset-password`,
+  LOGIN: `/auth/login`,
+  REGISTER: `/auth/register`,
+  LOGOUT: `/auth/logout`,
+  USER: `/auth/user`,
+  FORGOT_PASSWORD: `/auth/forgot-password`,
+  RESET_PASSWORD: `/auth/reset-password`,
   
   // Instances
-  INSTANCES: `/api/instances`,
-  INSTANCE: (id: number) => `/api/instances/${id}`,
-  INSTANCE_QR: (id: number) => `/api/instances/${id}/qr`,
-  INSTANCE_CONNECT: (id: number) => `/api/instances/${id}/connect`,
-  INSTANCE_DISCONNECT: (id: number) => `/api/instances/${id}/disconnect`,
-  INSTANCE_RESET: (id: number) => `/api/instances/${id}/reset`,
-  INSTANCE_STATUS: (id: number) => `/api/instances/${id}/status`,
+  INSTANCES: `/instances`,
+  INSTANCE: (id: number) => `/instances/${id}`,
+  INSTANCE_QR: (id: number) => `/instances/${id}/qr`,
+  INSTANCE_CONNECT: (id: number) => `/instances/${id}/connect`,
+  INSTANCE_DISCONNECT: (id: number) => `/instances/${id}/disconnect`,
+  INSTANCE_RESET: (id: number) => `/instances/${id}/reset`,
+  INSTANCE_STATUS: (id: number) => `/instances/${id}/status`,
   
   // Chats
-  CHATS: (instanceId: number) => `/api/instances/${instanceId}/chats`,
-  CHAT: (instanceId: number, chatId: number) => `/api/instances/${instanceId}/chats/${chatId}`,
+  CHATS: (instanceId: number) => `/instances/${instanceId}/chats`,
+  CHAT: (instanceId: number, chatId: number) => `/instances/${instanceId}/chats/${chatId}`,
   
   // Messages
-  MESSAGES: (instanceId: number, chatId: number) => `/api/instances/${instanceId}/chats/${chatId}/messages`,
-  SEND_MESSAGE: (instanceId: number, chatId: number) => `/api/instances/${instanceId}/chats/${chatId}/send`,
-  CHAT_MESSAGES: (chatId: number) => `/api/chats/${chatId}/messages`,
+  MESSAGES: (instanceId: number, chatId: number) => `/instances/${instanceId}/chats/${chatId}/messages`,
+  SEND_MESSAGE: (instanceId: number, chatId: number) => `/instances/${instanceId}/chats/${chatId}/send`,
+  CHAT_MESSAGES: (chatId: number) => `/chats/${chatId}/messages`,
   
   // AI Agents
-  AI_AGENTS: `/api/ai-agents`,
-  AI_AGENT: (id: number) => `/api/ai-agents/${id}`,
-  AI_AGENT_DOCUMENTS: (agentId: number) => `/api/ai-agents/${agentId}/documents`,
-  AI_AGENT_DOCUMENT: (agentId: number, documentId: number) => `/api/ai-agents/${agentId}/documents/${documentId}`,
-  AI_AGENT_CONVERSATIONS: (agentId: number) => `/api/ai-agents/${agentId}/conversations`,
-  AI_AGENT_CONVERSATION: (agentId: number, conversationId: number) => `/api/ai-agents/${agentId}/conversations/${conversationId}`,
-  AI_AGENT_CONVERSATION_MESSAGES: (agentId: number, conversationId: number) => `/api/ai-agents/${agentId}/conversations/${conversationId}/messages`,
+  AI_AGENTS: `/ai-agents`,
+  AI_AGENT: (id: number) => `/ai-agents/${id}`,
+  AI_AGENT_DOCUMENTS: (agentId: number) => `/ai-agents/${agentId}/documents`,
+  AI_AGENT_DOCUMENT: (agentId: number, documentId: number) => `/ai-agents/${agentId}/documents/${documentId}`,
+  AI_AGENT_CONVERSATIONS: (agentId: number) => `/ai-agents/${agentId}/conversations`,
+  AI_AGENT_CONVERSATION: (agentId: number, conversationId: number) => `/ai-agents/${agentId}/conversations/${conversationId}`,
+  AI_AGENT_CONVERSATION_MESSAGES: (agentId: number, conversationId: number) => `/ai-agents/${agentId}/conversations/${conversationId}/messages`,
   
   // Automations
-  AUTOMATIONS: `/api/automations`,
-  AUTOMATION: (id: number) => `/api/automations/${id}`,
-  AUTOMATION_NODES: (automationId: number) => `/api/automations/${automationId}/nodes`,
-  AUTOMATION_NODE: (automationId: number, nodeId: string) => `/api/automations/${automationId}/nodes/${nodeId}`,
-  AUTOMATION_EDGES: (automationId: number) => `/api/automations/${automationId}/edges`,
-  AUTOMATION_EDGE: (automationId: number, edgeId: string) => `/api/automations/${automationId}/edges/${edgeId}`,
-  AUTOMATION_PUBLISH: (automationId: number) => `/api/automations/${automationId}/publish`,
-  AUTOMATION_UNPUBLISH: (automationId: number) => `/api/automations/${automationId}/unpublish`,
+  AUTOMATIONS: `/automations`,
+  AUTOMATION: (id: number) => `/automations/${id}`,
+  AUTOMATION_NODES: (automationId: number) => `/automations/${automationId}/nodes`,
+  AUTOMATION_NODE: (automationId: number, nodeId: string) => `/automations/${automationId}/nodes/${nodeId}`,
+  AUTOMATION_EDGES: (automationId: number) => `/automations/${automationId}/edges`,
+  AUTOMATION_EDGE: (automationId: number, edgeId: string) => `/automations/${automationId}/edges/${edgeId}`,
+  AUTOMATION_PUBLISH: (automationId: number) => `/automations/${automationId}/publish`,
+  AUTOMATION_UNPUBLISH: (automationId: number) => `/automations/${automationId}/unpublish`,
   
   // API Keys
-  API_KEYS: `/api/user/api-keys`,
-  API_KEY: (id: number) => `/api/user/api-keys/${id}`,
-  VALIDATE_API_KEY: (id: number) => `/api/user/api-keys/${id}/validate`,
+  API_KEYS: `/user/api-keys`,
+  API_KEY: (id: number) => `/user/api-keys/${id}`,
+  VALIDATE_API_KEY: (id: number) => `/user/api-keys/${id}/validate`,
   
   // Tags
-  TAGS: `/api/tags`,
-  TAG: (id: number) => `/api/tags/${id}`,
-  CHAT_TAGS: (chatId: number) => `/api/chats/${chatId}/tags`,
+  TAGS: `/tags`,
+  TAG: (id: number) => `/tags/${id}`,
+  CHAT_TAGS: (chatId: number) => `/chats/${chatId}/tags`,
   
   // Dashboard
-  DASHBOARD_STATS: `/api/dashboard/stats`,
-  DASHBOARD_ACTIVITY: `/api/dashboard/activity`,
-  DASHBOARD_CHARTS: `/api/dashboard/charts`,
+  DASHBOARD_STATS: `/dashboard/stats`,
+  DASHBOARD_ACTIVITY: `/dashboard/activity`,
+  DASHBOARD_CHARTS: `/dashboard/charts`,
 };
 
 // HTTP Status
