@@ -24,15 +24,15 @@ class WebSocketClient {
     // Tentar obter o userId do localStorage para incluir na URL de conexão
     let userId = '';
     try {
-      const storedUserId = localStorage.getItem('userId');
+      const storedUserId = localStorage.getItem('user_id');
       if (storedUserId) {
-        userId = `?userId=${storedUserId}`;
+        userId = `/${storedUserId}`;
       }
     } catch (err) {
       console.error('Erro ao obter userId do localStorage:', err);
     }
     
-    this.url = `${protocol}//${window.location.host}/ws${userId ? userId : ''}`;
+    this.url = `${protocol}//${window.location.host}/ws${userId}`;
     
     console.log(`WebSocket URL: ${this.url}`);
   }
@@ -57,14 +57,14 @@ class WebSocketClient {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     let userId = '';
     try {
-      const storedUserId = localStorage.getItem('userId');
+      const storedUserId = localStorage.getItem('user_id');
       if (storedUserId) {
-        userId = `?userId=${storedUserId}`;
+        userId = `/${storedUserId}`;
       }
     } catch (err) {
       console.error('Erro ao obter userId do localStorage para reconexão:', err);
     }
-    this.url = `${protocol}//${window.location.host}/ws${userId ? userId : ''}`;
+    this.url = `${protocol}//${window.location.host}/ws${userId}`;
     
     console.log(`WebSocket URL: ${this.url}`);
     
@@ -315,12 +315,17 @@ class WebSocketClient {
   public identifyUser(): void {
     // First try to get the current userId from localStorage if available
     try {
-      const userId = localStorage.getItem('userId');
+      const userId = localStorage.getItem('user_id');
       if (userId) {
+        // Try to convert to numeric ID if possible
         const userIdNum = parseInt(userId, 10);
         if (!isNaN(userIdNum)) {
           this.send('identify', { userId: userIdNum });
           console.log(`Sent user identification to WebSocket server:`, userIdNum);
+          return;
+        } else {
+          this.send('identify', { userId });
+          console.log(`Sent user identification to WebSocket server:`, userId);
           return;
         }
       }
@@ -350,7 +355,7 @@ class WebSocketClient {
           console.log(`Sent user identification to WebSocket server:`, userId);
           
           // Store userId for future use
-          localStorage.setItem('userId', userId.toString());
+          localStorage.setItem('user_id', userId.toString());
         }
       })
       .catch(error => {
