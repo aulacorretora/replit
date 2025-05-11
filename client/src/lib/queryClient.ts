@@ -63,7 +63,7 @@ export async function apiRequest(
     }
 
     // Verificar se a resposta é um JSON válido para endpoints da API ou Supabase
-    if (url.includes('/api/') || url.includes('/auth/v1/')) {
+    if ((url.includes('/api/') || url.startsWith('/api')) || url.includes('/auth/v1/')) {
       const contentType = response.headers.get('content-type');
       if (!response.ok) {
         if (contentType && !contentType.includes('application/json')) {
