@@ -20,6 +20,11 @@ export default function Settings() {
   const { toast } = useToast();
   const isMobile = useMobile();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
   
   // State for notification settings
   const [notifications, setNotifications] = useState({
@@ -74,10 +79,20 @@ export default function Settings() {
   
   return (
     <div className="flex h-screen overflow-hidden bg-neutral-100">
-      <Sidebar isMobileOpen={sidebarOpen} closeMobileMenu={() => setSidebarOpen(false)} />
+      <Sidebar 
+        isMobileOpen={sidebarOpen} 
+        closeMobileMenu={() => setSidebarOpen(false)} 
+        isCollapsed={isCollapsed}
+        toggleSidebar={toggleSidebar}
+      />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header title={t('settings.title')} openMobileMenu={() => setSidebarOpen(true)} />
+        <Header 
+          title={t('settings.title')} 
+          openMobileMenu={() => setSidebarOpen(true)} 
+          toggleSidebar={toggleSidebar}
+          isSidebarCollapsed={isCollapsed}
+        />
         
         <main className="flex-1 overflow-auto p-4 md:p-6">
           <div className="mb-6">
