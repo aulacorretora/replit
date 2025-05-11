@@ -236,11 +236,6 @@ export const useInstance = (id?: number) => {
     queryFn: () => getQrCode(id!),
     enabled: enabled && !!instance && (instance.status === 'awaiting_qr' || instance.status === 'qr_ready'),
     refetchInterval: (instance?.status === 'awaiting_qr' || instance?.status === 'qr_ready') ? 10000 : false, // Refetch every 10 seconds if QR is ready
-    onSuccess: (data) => {
-      if (data && data.qrCode) {
-        setQrCode(data.qrCode);
-      }
-    }
   });
 
   // Um handler genérico para gerar QR Code
@@ -286,11 +281,11 @@ export const useInstance = (id?: number) => {
       
       console.error("QR code not available in response:", data);
       return null;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error generating QR code:', error);
       toast({
         title: t('qrcode.generateError'),
-        description: error.toString(),
+        description: error instanceof Error ? error.message : String(error),
         variant: 'destructive',
       });
       return null;
@@ -383,7 +378,7 @@ export const useInstance = (id?: number) => {
     loadingInstance,
     instanceError,
     refetchInstance,
-    qrCode: qrCode || (qrCodeData?.qrCode ?? null),
+    qrCode: qrCode || (qrCodeData && 'qrCode' in qrCodeData ? qrCodeData.qrCode : null),
     loadingQR,
     qrCodeError,
     generateQRCode,
