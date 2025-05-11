@@ -44,11 +44,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Armazena o ID do usuário no localStorage para uso em outras partes do aplicativo
       if (userObj.id) {
         console.log("Armazenando ID do usuário no localStorage:", userObj.id);
-        localStorage.setItem('userId', userObj.id.toString());
+        localStorage.setItem('user_id', userObj.id.toString());
       }
     } else {
       // Se não há dados do usuário, limpar localStorage
-      localStorage.removeItem('userId');
+      localStorage.removeItem('user_id');
     }
   }, [userData]);
 
