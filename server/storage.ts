@@ -46,7 +46,7 @@ export interface IStorage {
   
   // Instance operations
   getInstance(id: number): Promise<Instance | undefined>;
-  getInstanceByUser(userId: number): Promise<Instance | undefined>;
+  getInstanceByUser(userId: number | string): Promise<Instance | undefined>;
   getInstancesByUser(userId: number | string): Promise<Instance[]>;
   createInstance(instance: InsertInstance): Promise<Instance>;
   updateInstance(id: number, data: Partial<Instance>): Promise<Instance | undefined>;
